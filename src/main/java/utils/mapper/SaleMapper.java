@@ -33,7 +33,7 @@ public class SaleMapper implements  IMapper<Sale> {
         map.put("id",object.getId().toString());
         map.put("idTicket",object.getIdTicket().toString());
         map.put("idMatch",object.getIdMatch().toString());
-        map.put("person",object.getPerson());
+        map.put("person","'" + object.getPerson() + "'");
         map.put("quantity",object.getQuantity().toString());
         return map;
     }

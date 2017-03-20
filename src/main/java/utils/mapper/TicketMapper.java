@@ -29,6 +29,7 @@ public class TicketMapper implements IMapper<Ticket> {
         Map<String,String> map = new HashMap<>();
         map.put("id",object.getId().toString());
         map.put("price",object.getPrice().toString());
+
         return map;
     }
 }

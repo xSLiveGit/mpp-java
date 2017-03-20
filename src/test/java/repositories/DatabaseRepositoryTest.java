@@ -10,7 +10,9 @@ import utils.mapper.TicketMapper;
 import utils.validators.ValidatorTicket;
 
 import java.io.FileInputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
@@ -19,6 +21,26 @@ import static org.junit.Assert.*;
  * Created by Sergiu on 3/11/2017.
  */
 public class DatabaseRepositoryTest {
+    @Test
+    public void getItemsByProperty() throws Exception {
+        Map<String,String> map = new HashMap<>();
+        map.put("price","2");
+        Ticket ticket = new Ticket(3.0d);
+        Integer id = databaseRepository.add(ticket,true,true);
+        Integer size = databaseRepository.getSize();
+        assertEquals(size,new Integer(1));
+        Integer id2 = databaseRepository.add(new Ticket(2.0d),true,true);
+        List<Ticket> lst = databaseRepository.getItemsByProperty(map);
+        assertEquals(lst.size(),1);
+        assertTrue(lst.contains(new Ticket(id2,2d)));
+        assertFalse(lst.contains(new Ticket(3d)));
+        Integer id3 = databaseRepository.add(new Ticket(2.0d),true,true);
+        lst = databaseRepository.getItemsByProperty(map);
+        assertEquals(lst.size(),2);
+        assertTrue(lst.contains(new Ticket(id2,2d)));
+        assertFalse(lst.contains(new Ticket(id3,3d)));
+    }
+
     DatabaseRepository<Ticket> databaseRepository;
     DatabaseConnectionManager databaseConnectionManager;
     @Before
@@ -35,8 +57,8 @@ public class DatabaseRepositoryTest {
         Ticket t1 = new Ticket(1,2.0d);
         Ticket t2 = new Ticket(2,3.0d);
 
-        Integer id1 = databaseRepository.add(t1);
-        Integer id2 = databaseRepository.add(t2);
+        Integer id1 = databaseRepository.add(t1,true,true);
+        Integer id2 = databaseRepository.add(t2,true,true);
         List<Ticket> list = databaseRepository.getAll();
         assertEquals(list.size(),2);
         t1.setId(id1);
@@ -49,9 +71,9 @@ public class DatabaseRepositoryTest {
 
     @Test
     public void findById() throws Exception {
-        Integer id = databaseRepository.add(new Ticket(1,2.0d));
+        Integer id = databaseRepository.add(new Ticket(1,2.0d),true,true);
         try{
-            Ticket el = databaseRepository.findById(id);
+            Ticket el = databaseRepository.findById(id,true,true);
             assertEquals(el,new Ticket(id,2.0d));
             assertTrue(true);
         }
@@ -60,7 +82,7 @@ public class DatabaseRepositoryTest {
         }
 
         try{
-            Ticket el = databaseRepository.findById(id-1);
+            Ticket el = databaseRepository.findById(id-1,true,true);
             assertFalse(true);
         }
         catch (RepositoryException e){
@@ -71,8 +93,8 @@ public class DatabaseRepositoryTest {
 
     @Test
     public void update() throws Exception {
-        Integer id1 = databaseRepository.add(new Ticket(2.0d));
-        databaseRepository.update(new Ticket(id1,3.0d));
+        Integer id1 = databaseRepository.add(new Ticket(2.0d),true,true);
+        databaseRepository.update(new Ticket(id1,3.0d),true,true);
         List<Ticket> lst = databaseRepository.getAll();
         assertEquals(lst.size(),1);
         assertTrue(lst.contains(new Ticket(id1,3.0d)));
@@ -83,10 +105,10 @@ public class DatabaseRepositoryTest {
     @Test
     public void add() throws Exception {
         Ticket ticket = new Ticket(3.0d);
-        Integer id = databaseRepository.add(ticket);
+        Integer id = databaseRepository.add(ticket,true,true);
         Integer size = databaseRepository.getSize();
         assertEquals(size,new Integer(1));
-        Integer id2 = databaseRepository.add(new Ticket(2.0d));
+        Integer id2 = databaseRepository.add(new Ticket(2.0d),true,true);
         List<Ticket> lst = databaseRepository.getAll();
         assertTrue(lst.contains(new Ticket(id,3.0d)));
         assertTrue(lst.contains(new Ticket(id2,2.0d)));
@@ -96,17 +118,18 @@ public class DatabaseRepositoryTest {
     public void delete() throws Exception {
         Ticket t1 = new Ticket(2.0d);
         Ticket t2 = new Ticket(3.0d);
-        Integer id1 = databaseRepository.add(t1);
-        Integer id2 = databaseRepository.add(t2);
+        Integer id1 = databaseRepository.add(t1,true,true);
+        Integer id2 = databaseRepository.add(t2,true,true);
         List<Ticket> list = databaseRepository.getAll();
         assertEquals(list.size(),2);
-        databaseRepository.delete(id1);
+        databaseRepository.delete(id1,true,true);
         list = databaseRepository.getAll();
         assertEquals(list.size(),1);
         t2.setId(id2);
         t1.setId(id1);
         assertTrue(list.contains(t2));
         assertFalse(list.contains(t1));
+        assertTrue(true);//test
     }
 
     @Test

@@ -1,5 +1,7 @@
 package utils.exceptions;
 
+import java.util.ArrayList;
+
 /**
  * Created by Sergiu on 3/11/2017.
  */
@@ -20,7 +22,7 @@ public class RepositoryException extends Exception {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public RepositoryException() {
+    public RepositoryException(String join, ArrayList<String> errList) {
         super();
     }
 }

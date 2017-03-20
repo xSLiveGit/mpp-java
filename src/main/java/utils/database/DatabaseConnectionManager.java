@@ -23,6 +23,7 @@ public class DatabaseConnectionManager {
             String USER = properties.getProperty("USER");
             String PASS = properties.getProperty("PASS");
             this.connection = DriverManager.getConnection(DB_URL,USER,PASS);
+            connection.setAutoCommit(false);
         }
         return connection;
 

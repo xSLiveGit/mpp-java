@@ -10,17 +10,19 @@ public class Match implements IEntity<Integer>{
     private String stage;
     private Integer remainingTickets;
     private Integer id;
+    private Double price;
 
-    public Match(Integer id,String team1, String team2, String stage, Integer remainingTickets) {
+    public Match(Integer id,String team1, String team2, String stage, Integer remainingTickets,Double price) {
         this.team1 = team1;
         this.team2 = team2;
         this.stage = stage;
         this.remainingTickets = remainingTickets;
         this.id = id;
+        this.price = price;
     }
 
-    public Match(String team1,String team2,String stage,Integer remainingTickets){
-        this(-1,team1,team1,stage,remainingTickets);
+    public Match(String team1,String team2,String stage,Integer remainingTickets,Double price){
+        this(-1,team1,team1,stage,remainingTickets,price);
     }
 
     public void decreaseTicketsNumber(){
@@ -28,7 +30,7 @@ public class Match implements IEntity<Integer>{
     }
 
     public Match() {
-        this(-1,"","","",0);
+        this(-1,"","","",0,0d);
     }
 
     public void setTeam1(String team1) {
@@ -47,6 +49,12 @@ public class Match implements IEntity<Integer>{
         this.remainingTickets = remainingTickets;
     }
 
+    public String getTicketsString(){
+        if(remainingTickets <= 0)
+            return "SOLD OUT";
+        return remainingTickets.toString();
+    }
+
     public String getTeam1() {
 
         return team1;
@@ -62,6 +70,15 @@ public class Match implements IEntity<Integer>{
 
     public Integer getRemainingTickets() {
         return remainingTickets;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Double getPrice() {
+
+        return price;
     }
 
     @Override

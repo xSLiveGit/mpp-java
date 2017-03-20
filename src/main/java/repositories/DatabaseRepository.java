@@ -10,11 +10,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Sergiu on 3/11/2017.
  */
-public  class DatabaseRepository<E extends IEntity<Integer>> implements IRepository<E,Integer> {
+public  class DatabaseRepository<E extends IEntity<Integer>> implements IDatabaseRepository<E,Integer> {
     protected String tableName;
     protected Connection connection;
     protected IMapper<E> mapper;
@@ -41,6 +42,7 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IReposit
                 E el = mapper.toObject(rs);
                 list.add(el);
             }
+//            connection.commit();
         } catch (SQLException e) {
             codeThrowRepositoryException(e);
         }
@@ -48,22 +50,40 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IReposit
     }
 
     @Override
-    public E findById(Integer id) throws RepositoryException {
+    public E findById(Integer id,boolean startTransaction,boolean endTransaction) throws RepositoryException {
         String query = String.format("SELECT * FROM `%s` WHERE `%s` = ?",tableName,mapper.getIdTextField());
         ResultSet rs = null;
         PreparedStatement stmt;
         E el = null;
         try {
+            if(startTransaction)
+                connection.setAutoCommit(false);
             stmt = connection.prepareStatement(query);
             stmt.setString(1,id.toString());
             rs = stmt.executeQuery();
             while(rs.next()){
                 el = mapper.toObject(rs);
             }
+            if(endTransaction)
+                connection.commit();
             rs.close();
         }
         catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                codeThrowRepositoryException(e1);
+            }
             codeThrowRepositoryException(e);
+        }
+        finally {
+            if(endTransaction){
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    codeThrowRepositoryException(e);
+                }
+            }
         }
         if(null == el)
             throw new RepositoryException("This id do not exist.");
@@ -71,26 +91,49 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IReposit
     }
 
     @Override
-    public void update(E element) throws RepositoryException {
+    public void update(E element,boolean startTransaction,boolean endTransaction) throws RepositoryException {
         String updateS = "";
         Map<String,String> map = mapper.toMap(element);
-        updateS += mapper.getIdTextField() + "=" + map.get(mapper.getIdTextField());
+        List<String > values = new ArrayList<>();
+        updateS += mapper.getIdTextField() + "=?";
+        values.add(map.get(mapper.getIdTextField()));
         map.remove(mapper.getIdTextField());
         for(Map.Entry<String,String> entry : map.entrySet()){
-            updateS += "," + entry.getKey() + "=" + entry.getValue() + " ";
+            updateS += "," + entry.getKey() + "=?";
+            values.add(entry.getValue());
         }
         String query = String.format("UPDATE `%s` SET %s WHERE `%s` = ?",tableName,updateS,mapper.getIdTextField());
+        System.out.print(query);
         try {
+            if(startTransaction)
+                connection.setAutoCommit(false);
             PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1,element.getId().toString());
+            for(Integer i=0;i<values.size();i++)
+                statement.setString(i+1,values.get(i));
+            statement.setString(values.size()+1,element.getId().toString());
             statement.executeUpdate();
+            if(endTransaction)
+                connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                codeThrowRepositoryException(e1);
+            }
             codeThrowRepositoryException(e);
+        }
+        finally {
+            if(endTransaction)
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    codeThrowRepositoryException(e);
+                }
         }
     }
 
     @Override
-    public Integer add(E element) throws RepositoryException {
+    public Integer add(E element,boolean startTransaction,boolean endTransaction) throws RepositoryException {
         ArrayList<String> paramsV = new ArrayList<>();
         ArrayList<String> valuesV = new ArrayList<>();
         String params = "";
@@ -106,17 +149,21 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IReposit
         }
 
         params = String.join(",",paramsV);
-        values = String.join(",",valuesV);
-
+        values = "?";
+        if(valuesV.size() > 1)
+            values = values + (new String(new char[valuesV.size() - 1]).replace("\0", " ,?"));
         System.out.println(params);
         System.out.println(values);
 
         String query = String.format("INSERT INTO `%s` (%s) VALUES (%s)",tableName,params,values);
         try {
-            connection.setAutoCommit(false);
+            if(startTransaction)
+                connection.setAutoCommit(false);
             PreparedStatement stmt = connection.prepareStatement(query);
-//            stmt.setString(1,params);
-//            stmt.setString(2,values);
+            for(Integer i=0;i<valuesV.size();i++){
+                stmt.setString(i+1,valuesV.get(i));
+            }
+
             stmt.execute();
            // stmt.close();
 
@@ -124,7 +171,9 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IReposit
             ResultSet rs = stmt.executeQuery(query);
             rs.next();
             returnedId = (rs.getInt(1));
-            connection.commit();
+            if(endTransaction){
+                connection.commit();
+            }
 
         } catch (SQLException e) {
             try {
@@ -136,7 +185,8 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IReposit
         }
         finally {
             try {
-                connection.setAutoCommit(true);
+                if(endTransaction)
+                    connection.setAutoCommit(true);
             } catch (SQLException e) {
                 codeThrowRepositoryException(e);
             }
@@ -145,15 +195,36 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IReposit
     }
 
     @Override
-    public E delete(Integer id) throws RepositoryException {
+    public E delete(Integer id,boolean startTransaction,boolean endTransaction) throws RepositoryException {
         String queryD =String.format("DELETE FROM `%s` WHERE `%s` = ?",tableName,mapper.getIdTextField());
-        E el = findById(id);
+        E el = null;
+
         try {
+            if(startTransaction){
+                connection.setAutoCommit(false);
+            }
+            el = findById(id,startTransaction,false);
+
             PreparedStatement stmt = connection.prepareStatement(queryD);
             stmt.setString(1,id.toString());
             stmt.executeUpdate();
+            if(endTransaction)
+                connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                codeThrowRepositoryException(e1);
+            }
             codeThrowRepositoryException(e);
+        }
+        finally {
+            if(endTransaction)
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    codeThrowRepositoryException(e);
+                }
         }
         return el;
     }
@@ -167,6 +238,7 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IReposit
             ResultSet rs = stmt.executeQuery();
             rs.next();
             a = rs.getInt("sz");
+//            connection.commit();
         } catch (SQLException e) {
             codeThrowRepositoryException(e);
         }
@@ -179,6 +251,7 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IReposit
         try {
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.execute();
+//            connection.commit();
         } catch (SQLException e) {
             codeThrowRepositoryException(e);
         }
@@ -188,4 +261,31 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IReposit
         throw new RepositoryException(exc);
     }
 
+    public List<E> getItemsByProperty(Map<String,String> map) throws RepositoryException {
+        ArrayList<String> paramsV = new ArrayList<>();
+        ArrayList<String> valuesV = new ArrayList<>();
+        ArrayList<E> list = new ArrayList<E>();
+
+        for(Map.Entry<String,String> entry : map.entrySet()){
+            paramsV.add(entry.getKey());
+            valuesV.add(entry.getValue());
+        }//I done this to be sure that parameters with linked values are in the same order
+        String condition = String.join(" AND ",paramsV.stream().map(x -> x = x + "=?").collect(Collectors.toList()));
+        String query = String.format("SELECT * FROM `%s` WHERE %s",tableName,condition);
+        System.out.println(query);
+        try {
+            PreparedStatement stmt = connection.prepareStatement(query);
+            for(Integer i=0;i<valuesV.size();i++)
+                stmt.setString(i+1,valuesV.get(i));
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                E el = mapper.toObject(rs);
+                list.add(el);
+            }
+//            connection.commit();
+        } catch (SQLException e) {
+            codeThrowRepositoryException(e);
+        }
+        return list;
+    }
 }
