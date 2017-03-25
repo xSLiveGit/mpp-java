@@ -2,15 +2,10 @@ package gui;
 
 import Users.GUIControllerUserLogIn;
 import controllers.MatchController;
-import controllers.SaleController;
 import controllers.TicketController;
 import controllers.UserController;
-import domain.Match;
-import domain.Ticket;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import utils.database.DatabaseConnectionManager;
@@ -27,15 +22,13 @@ public class GUI {
     private Pane globalPane;
     private MatchController matchController;
     private TicketController ticketController;
-    private SaleController saleController;
     private DatabaseConnectionManager databaseConnectionManager;
     private UserController userController;
 
-    public GUI(MatchController matchController, TicketController ticketController, SaleController saleController, DatabaseConnectionManager databaseConnectionManager, UserController userController) throws IOException, ControllerException {
+    public GUI(MatchController matchController, TicketController ticketController, DatabaseConnectionManager databaseConnectionManager, UserController userController) throws IOException, ControllerException {
         this.databaseConnectionManager = databaseConnectionManager;
         currentStage = new Stage();
         this.matchController = matchController;
-        this.saleController = saleController;
         this.ticketController = ticketController;
         this.userController = userController;
 //        FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/gui.fxml"));
@@ -49,7 +42,7 @@ public class GUI {
         globalPane = loader.load();
         currentScene = new Scene(globalPane);
         GUIControllerUserLogIn guiControllerUserLogIn = loader.getController();
-        guiControllerUserLogIn.initComponents(currentStage,userController,matchController,ticketController,saleController,databaseConnectionManager);
+        guiControllerUserLogIn.initComponents(currentStage,userController,matchController,ticketController,databaseConnectionManager);
         currentStage.setScene(currentScene);
     }
 

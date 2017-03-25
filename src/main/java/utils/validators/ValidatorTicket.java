@@ -16,16 +16,28 @@ public class ValidatorTicket implements IValidator<Ticket> {
         this.errList = new ArrayList<>();
     }
 
-    private void validatePrice(Double price){
-        if(price < 0){
-            errList.add("The price of tickets must be greater than 0");
+    private void validateQuantity(Integer quantity)
+    {
+        if (quantity <= 0)
+        {
+            errList.add("Quantity must be nonnegative number.");
         }
     }
+
+    private void validatePerson(String person)
+    {
+        if(person.equals(""))
+            errList.add("The person can't be empty.");
+        if(person.length() > 30)
+            errList.add("The length of person must be <= 30.");
+    }
+
 
     @Override
     public void validate(Ticket el) throws RepositoryException {
         errList.clear();
-        validatePrice(el.getPrice());
+        validateQuantity(el.getQuantity());
+        validatePerson(el.getPerson());
         if(errList.size() != 0){
             throw new RepositoryException(errList.toString());
         }

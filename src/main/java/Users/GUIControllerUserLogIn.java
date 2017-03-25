@@ -1,9 +1,9 @@
 package Users;
 
 import controllers.MatchController;
-import controllers.SaleController;
 import controllers.TicketController;
 import controllers.UserController;
+import domain.User;
 import gui.GUIController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,7 +29,6 @@ public class GUIControllerUserLogIn {
     private Stage currentStage;
     MatchController matchController;
     TicketController ticketController;
-    SaleController saleController;
     DatabaseConnectionManager databaseConnectionManager;
 
     @FXML
@@ -50,14 +49,12 @@ public class GUIControllerUserLogIn {
             UserController userController,
             MatchController matchController,
             TicketController ticketController,
-            SaleController saleController,
             DatabaseConnectionManager databaseConnectionManager
     ) throws IOException {
         this.userController = userController;
         this.currentStage = currentStage;
         this.matchController = matchController;
         this.ticketController = ticketController;
-        this.saleController = saleController;
         this.databaseConnectionManager = databaseConnectionManager;
         this.currentStage = currentStage;
         this.button_LogIn.setId("my-log-button");
@@ -69,23 +66,21 @@ public class GUIControllerUserLogIn {
         String userName = textField_UserName.getText();
         String password = textField_Password.getText();
         try {
-            boolean succes = userController.logIn(userName,password);
+            User u = userController.logIn(userName,password);
 
-            if(succes){
-
+            if(u != null){
                 FXMLLoader GUILoader = new FXMLLoader(getClass().getResource("/FXML/gui.fxml"));
                 BorderPane pane = GUILoader.load();
                 Scene scene = new Scene(pane);
                 GUIController guiController = GUILoader.getController();
                 Stage stage = new Stage();
-                guiController.initComponents(stage,matchController,ticketController,saleController,databaseConnectionManager,userController);
+                guiController.initComponents(stage,matchController,ticketController,databaseConnectionManager,userController);
                 stage.setTitle("Application");
                 stage.setScene(scene);
                 stage.setResizable(false);
 
                 currentStage.hide();
                 stage.show();
-
             }
             else{
                 StaticHelperClass.showWarningMessage("Invalid username or password");

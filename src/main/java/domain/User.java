@@ -3,21 +3,20 @@ package domain;
 /**
  * Created by Sergiu on 1/19/2017.
  */
-public class User implements IEntity<Integer> {
+public class User implements IEntity<String> {
     private String username;
     private String password;
     private Integer id;
 
     @Override
-    public Integer getId() {
-        return this.id;
+    public String getId() {
+        return this.getUsername();
     }
 
     @Override
-    public void setId(Integer id) {
-        this.id = id;
+    public void setId(String s) {
+        setUsername(s);
     }
-
 
 
     public User(String username, String password) {
@@ -44,5 +43,25 @@ public class User implements IEntity<Integer> {
 
     public String getUsername() {
         return username;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+
+        User user = (User) o;
+
+        if (!username.equals(user.username)) return false;
+        if (!password.equals(user.password)) return false;
+        return id.equals(user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = username.hashCode();
+        result = 31 * result + password.hashCode();
+        result = 31 * result + id.hashCode();
+        return result;
     }
 }

@@ -11,8 +11,7 @@ import javafx.scene.paint.Color;
 import utils.StaticHelperClass;
 import utils.database.DatabaseConnectionManager;
 import utils.exceptions.ControllerException;
-
-import java.sql.SQLException;
+import utils.exceptions.EntityArgumentException;
 
 /**
  * Created by Sergiu on 3/19/2017.
@@ -66,7 +65,7 @@ public class ManageMatchesGUIController {
                 textField_Team1.setText(currentSelectedMatch.getTeam1());
                 textField_Team2.setText(currentSelectedMatch.getTeam2());
                 textField_Stage.setText(currentSelectedMatch.getStage());
-                textField_NoTickets.setText(currentSelectedMatch.getRemainingTickets().toString());
+                textField_NoTickets.setText(currentSelectedMatch.getTickets().toString());
                 textField_Price.setText(currentSelectedMatch.getPrice().toString());
             }
         });
@@ -102,9 +101,9 @@ public class ManageMatchesGUIController {
     public void button_AddTicket_Handler(){
 
         try {
-            matchController.add(textField_Team1.getText(),textField_Team2.getText(),textField_Stage.getText(),textField_NoTickets.getText(),textField_Price.getText(),true,true);
+            matchController.add(textField_Team1.getText(),textField_Team2.getText(),textField_Stage.getText(),textField_NoTickets.getText(),textField_Price.getText());
             actualiseList();
-        } catch (ControllerException e) {
+        } catch (ControllerException | EntityArgumentException e) {
             StaticHelperClass.showWarningMessage(e.getMessage());
         }
     }
@@ -116,7 +115,6 @@ public class ManageMatchesGUIController {
         }
         try {
             matchController.update(currentSelectedMatch.getId(),textField_Team1.getText(),textField_Team2.getText(),textField_Stage.getText(),textField_NoTickets.getText(),textField_Price.getText(),true,true);
-//            databaseConnectionManager.getConnection().commit();
             actualiseList();
         } catch (ControllerException  e) {
             StaticHelperClass.showWarningMessage(e.getMessage());
@@ -129,8 +127,7 @@ public class ManageMatchesGUIController {
             return;
         }
         try {
-            matchController.delete(currentSelectedMatch.getId().toString(),true,true);
-//            databaseConnectionManager.getConnection().commit();
+            matchController.delete(currentSelectedMatch.getId().toString());
             actualiseList();
         } catch (ControllerException e){
             StaticHelperClass.showWarningMessage(e.getMessage());

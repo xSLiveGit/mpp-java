@@ -2,7 +2,6 @@ package gui;
 
 import Users.GUIControllerUserLogIn;
 import controllers.MatchController;
-import controllers.SaleController;
 import controllers.TicketController;
 import controllers.UserController;
 import javafx.application.Platform;
@@ -24,7 +23,6 @@ import java.io.IOException;
 public class GUIController {
     private Stage currentStage;
     private MatchController matchController;
-    private SaleController saleController;
     private TicketController ticketController;
     private DatabaseConnectionManager databaseConnectionManager;
     private UserController userController;
@@ -47,12 +45,10 @@ public class GUIController {
             Stage currentStage,
             MatchController matchController,
             TicketController ticketController,
-            SaleController saleController,
             DatabaseConnectionManager databaseConnectionManager,
             UserController userController
     ) throws IOException, ControllerException {
         this.matchController = matchController;
-        this.saleController = saleController;
         this.ticketController = ticketController;
         this.databaseConnectionManager = databaseConnectionManager;
         this.currentStage = currentStage;
@@ -61,7 +57,7 @@ public class GUIController {
         loaderMainInterface = new FXMLLoader(getClass().getResource("/FXML/mainInterface.fxml"));
         this.parent_SellTickets = loaderMainInterface.load();
          operationGUIController = loaderMainInterface.getController();
-        operationGUIController.initComponents(matchController,ticketController,saleController,databaseConnectionManager);
+        operationGUIController.initComponents(matchController,ticketController,databaseConnectionManager);
 
         loaderMainInterface = new FXMLLoader(getClass().getResource("/FXML/matchInterface.fxml"));
         this.parent_Match = loaderMainInterface.load();
@@ -100,7 +96,7 @@ public class GUIController {
             Pane pane = loader.load();
             Scene scene = new Scene(pane);
             GUIControllerUserLogIn guiControllerUserLogIn = loader.getController();
-            guiControllerUserLogIn.initComponents(currentStage,userController,matchController,ticketController,saleController,databaseConnectionManager);
+            guiControllerUserLogIn.initComponents(currentStage,userController,matchController,ticketController,databaseConnectionManager);
 
             Stage stage = new Stage();
             stage.setScene(scene);

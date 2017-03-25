@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.text.Text?>
 
 <Pane maxHeight="450" maxWidth="526" minHeight="450" minWidth="526" prefHeight="450.0" prefWidth="526.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.OperationGUIController">
    <children>
-      <TableView fx:id="tableView_Match" prefHeight="337.0" prefWidth="526.0">
+      <TableView fx:id="tableView_Match" prefHeight="377.0" prefWidth="526.0">
         <columns>
           <TableColumn fx:id="tableColumn_Team1" prefWidth="75.0" text="Team1" />
           <TableColumn fx:id="tableColumn_Team2" prefWidth="75.0" text="Team2" />
@@ -22,13 +20,9 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy>
       </TableView>
-      <TextField fx:id="textField_BuyerName" layoutX="5.0" layoutY="348.0" prefHeight="25.0" prefWidth="176.0" promptText="Buyer's username" />
-      <Button fx:id="button_AddMatch" layoutX="194.0" layoutY="382.0" mnemonicParsing="false" onAction="#button_AddMatch_Handler" prefHeight="25.0" prefWidth="327.0" text="Add" />
-      <TextField fx:id="textField_Capacity" layoutX="5.0" layoutY="382.0" prefHeight="25.0" prefWidth="75.0" promptText="Capacity" />
-      <Button fx:id="button_CancelOperation" layoutX="367.0" layoutY="347.0" mnemonicParsing="false" onAction="#button_CancelOperation_Handler" prefHeight="25.0" prefWidth="153.0" text="Cancel operation" />
-      <Button fx:id="button_FilterMatches" layoutX="195.0" layoutY="347.0" mnemonicParsing="false" onAction="#button_FilterMatches_Handler" prefHeight="25.0" prefWidth="153.0" text="Filter matches" />
-      <Button fx:id="button_ExportTicket" layoutX="5.0" layoutY="417.0" mnemonicParsing="false" onAction="#button_ExportTicket_Handler" prefHeight="25.0" prefWidth="516.0" text="Export Ticket" />
-      <Text layoutX="93.0" layoutY="399.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Total price:" />
-      <Label fx:id="label_TotalPrice" layoutX="164.0" layoutY="386.0" text="0" />
+      <TextField fx:id="textField_BuyerName" layoutX="5.0" layoutY="382.0" prefHeight="25.0" prefWidth="183.0" promptText="Buyer's username" />
+      <Button fx:id="button_AddMatch" layoutX="195.0" layoutY="415.0" mnemonicParsing="false" onAction="#button_AddMatch_Handler" prefHeight="25.0" prefWidth="327.0" text="Add" />
+      <TextField fx:id="textField_Capacity" layoutX="5.0" layoutY="415.0" prefHeight="25.0" prefWidth="183.0" promptText="Capacity" />
+      <Button fx:id="button_FilterMatches" layoutX="195.0" layoutY="382.0" mnemonicParsing="false" onAction="#button_FilterMatches_Handler" prefHeight="25.0" prefWidth="327.0" text="Filter matches" />
    </children>
 </Pane>

@@ -1,8 +1,11 @@
 package controllers;
 
+import domain.Match;
 import domain.Ticket;
 import repositories.IDatabaseRepository;
 import repositories.IRepository;
+import repositories.MatchRepository;
+import repositories.TicketRepository;
 import utils.exceptions.ControllerException;
 import utils.exceptions.RepositoryException;
 
@@ -12,40 +15,75 @@ import java.sql.SQLException;
  * Created by Sergiu on 3/16/2017.
  */
 public class TicketController {
-    IDatabaseRepository<Ticket,Integer> ticketRepository;
-
-    public TicketController(IDatabaseRepository<Ticket, Integer> ticketRepository) {
+    TicketRepository ticketRepository;
+    MatchRepository matchRepository;
+    public TicketController(TicketRepository ticketRepository,MatchRepository matchRepository) {
         this.ticketRepository = ticketRepository;
+        this.matchRepository = matchRepository;
     }
 
-    public Integer add(Double price,boolean startTransaction,boolean endTransaction) throws ControllerException {
+    public Integer add(String idMatch,String person,String quantity) throws ControllerException {
         Integer id = null;
+        Integer idMatchI = null;
+        Integer quantityI = null;
+        try{
+            idMatchI = Integer.parseInt(idMatch);
+            quantityI = Integer.parseInt(quantity);
+        }
+        catch (Exception e){
+            codeThrowControllerExceptionStatement("Invalid integer.");
+        }
+
         try {
-            id = this.ticketRepository.add(new Ticket(price),startTransaction,endTransaction);
-        } catch (RepositoryException | SQLException e) {
+            matchRepository.sellTickets(idMatchI,quantityI);
+            id = this.ticketRepository.addId(new Ticket(idMatchI,person,quantityI));
+
+        } catch (RepositoryException e) {
             codeThrowControllerExceptionStatement(e);
         }
         return id;
     }
 
-    public Ticket delete(Integer id,boolean startTransaciton,boolean endTransaction) throws ControllerException {
+    public Ticket delete(String id) throws ControllerException {
+        Integer idI = null;
+        try{
+            idI = Integer.parseInt(id);
+        }
+        catch (Exception e){
+            codeThrowControllerExceptionStatement("Invalid integer.");
+        }
         try {
-            return this.ticketRepository.delete(id,startTransaciton,endTransaction);
+            return this.ticketRepository.delete(idI);
         } catch (RepositoryException e) {
             codeThrowControllerExceptionStatement(e);
         }
         return null;
     }
 
-    public void update(Integer id,Double price,boolean startTransaciton,boolean endTransaction) throws ControllerException {
+    public void update(String id,String idMatch,String person,String quantity) throws ControllerException {
+        Integer idI = null;
+        Integer idMatchI = null;
+        Integer quantityI = null;
+        try{
+            idMatchI = Integer.parseInt(idMatch);
+            quantityI = Integer.parseInt(quantity);
+            idI = Integer.parseInt(id);
+        }
+        catch (Exception e){
+            codeThrowControllerExceptionStatement("Invalid integer.");
+        }
         try {
-            this.ticketRepository.update(new Ticket(id,price),startTransaciton,endTransaction);
+            this.ticketRepository.update(new Ticket(idI,idMatchI,person,quantityI));
         } catch (RepositoryException e) {
             codeThrowControllerExceptionStatement(e);
         }
     }
 
     private void codeThrowControllerExceptionStatement(Exception e) throws ControllerException {
+        throw new ControllerException(e);
+    }
+
+    private void codeThrowControllerExceptionStatement(String e) throws ControllerException {
         throw new ControllerException(e);
     }
 }

@@ -2,8 +2,8 @@ package repositories;
 
 import domain.IEntity;
 import utils.database.DatabaseConnectionManager;
+import utils.exceptions.EntityArgumentException;
 import utils.exceptions.RepositoryException;
-import utils.mapper.IMapper;
 import utils.validators.IValidator;
 
 import java.sql.*;
@@ -15,14 +15,13 @@ import java.util.stream.Collectors;
 /**
  * Created by Sergiu on 3/11/2017.
  */
-public  class DatabaseRepository<E extends IEntity<Integer>> implements IDatabaseRepository<E,Integer> {
+public abstract class AbstractDatabaseRepository<E extends IEntity<ID>,ID> implements IDatabaseRepository<E,ID> {
+
     protected String tableName;
     protected Connection connection;
-    protected IMapper<E> mapper;
     protected IValidator<E> validator;
-    public DatabaseRepository(DatabaseConnectionManager dbConnManager,IMapper<E> mapper,String tableName,IValidator<E> validator) throws RepositoryException {
+    public AbstractDatabaseRepository(DatabaseConnectionManager dbConnManager, String tableName, IValidator<E> validator) throws RepositoryException {
         try {
-            this.mapper = mapper;
             this.connection = dbConnManager.getConnection();
             this.tableName = tableName;
             this.validator = validator;
@@ -39,7 +38,7 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IDatabas
             PreparedStatement stmt = connection.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-                E el = mapper.toObject(rs);
+                E el = this.toObject(rs);
                 list.add(el);
             }
 //            connection.commit();
@@ -50,22 +49,18 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IDatabas
     }
 
     @Override
-    public E findById(Integer id,boolean startTransaction,boolean endTransaction) throws RepositoryException {
-        String query = String.format("SELECT * FROM `%s` WHERE `%s` = ?",tableName,mapper.getIdTextField());
+    public E findById(ID id) throws RepositoryException {
+        String query = String.format("SELECT * FROM `%s` WHERE `%s` = ?",tableName,this.getIdTextField());
         ResultSet rs = null;
         PreparedStatement stmt;
         E el = null;
         try {
-            if(startTransaction)
-                connection.setAutoCommit(false);
             stmt = connection.prepareStatement(query);
             stmt.setString(1,id.toString());
             rs = stmt.executeQuery();
-            while(rs.next()){
-                el = mapper.toObject(rs);
+            while(rs.next()) {
+                el = this.toObject(rs);
             }
-            if(endTransaction)
-                connection.commit();
             rs.close();
         }
         catch (SQLException e) {
@@ -76,44 +71,32 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IDatabas
             }
             codeThrowRepositoryException(e);
         }
-        finally {
-            if(endTransaction){
-                try {
-                    connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    codeThrowRepositoryException(e);
-                }
-            }
-        }
         if(null == el)
             throw new RepositoryException("This id do not exist.");
         return el;
     }
 
     @Override
-    public void update(E element,boolean startTransaction,boolean endTransaction) throws RepositoryException {
+    public void update(E element) throws RepositoryException {
+        validator.validate(element);
         String updateS = "";
-        Map<String,String> map = mapper.toMap(element);
+        Map<String,String> map = this.toMap(element);
         List<String > values = new ArrayList<>();
-        updateS += mapper.getIdTextField() + "=?";
-        values.add(map.get(mapper.getIdTextField()));
-        map.remove(mapper.getIdTextField());
+        updateS += this.getIdTextField() + "=?";
+        values.add(map.get(this.getIdTextField()));
+        map.remove(this.getIdTextField());
         for(Map.Entry<String,String> entry : map.entrySet()){
             updateS += "," + entry.getKey() + "=?";
             values.add(entry.getValue());
         }
-        String query = String.format("UPDATE `%s` SET %s WHERE `%s` = ?",tableName,updateS,mapper.getIdTextField());
+        String query = String.format("UPDATE `%s` SET %s WHERE `%s` = ?",tableName,updateS,this.getIdTextField());
         System.out.print(query);
         try {
-            if(startTransaction)
-                connection.setAutoCommit(false);
             PreparedStatement statement = connection.prepareStatement(query);
             for(Integer i=0;i<values.size();i++)
                 statement.setString(i+1,values.get(i));
             statement.setString(values.size()+1,element.getId().toString());
             statement.executeUpdate();
-            if(endTransaction)
-                connection.commit();
         } catch (SQLException e) {
             try {
                 connection.rollback();
@@ -122,18 +105,12 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IDatabas
             }
             codeThrowRepositoryException(e);
         }
-        finally {
-            if(endTransaction)
-                try {
-                    connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    codeThrowRepositoryException(e);
-                }
-        }
     }
 
     @Override
-    public Integer add(E element,boolean startTransaction,boolean endTransaction) throws RepositoryException {
+    public void add(E element) throws RepositoryException {
+        validator.validate(element);
+
         ArrayList<String> paramsV = new ArrayList<>();
         ArrayList<String> valuesV = new ArrayList<>();
         String params = "";
@@ -141,8 +118,7 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IDatabas
         Map<String,String> map;
         Integer returnedId = null;
 
-        map = mapper.toMap(element);
-        map.remove(mapper.getIdTextField());
+        map = this.toMap(element);
         for(Map.Entry<String,String> pair : map.entrySet()){
             valuesV.add(pair.getValue());
             paramsV.add("`" + pair.getKey() + "`");
@@ -152,79 +128,38 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IDatabas
         values = "?";
         if(valuesV.size() > 1)
             values = values + (new String(new char[valuesV.size() - 1]).replace("\0", " ,?"));
-        System.out.println(params);
-        System.out.println(values);
 
         String query = String.format("INSERT INTO `%s` (%s) VALUES (%s)",tableName,params,values);
         try {
-            if(startTransaction)
-                connection.setAutoCommit(false);
+
             PreparedStatement stmt = connection.prepareStatement(query);
             for(Integer i=0;i<valuesV.size();i++){
                 stmt.setString(i+1,valuesV.get(i));
             }
 
             stmt.execute();
-           // stmt.close();
-
-            query = String.format("SELECT LAST_INSERT_ID() as id from `%s`",tableName);
-            ResultSet rs = stmt.executeQuery(query);
-            rs.next();
-            returnedId = (rs.getInt(1));
-            if(endTransaction){
-                connection.commit();
-            }
+            stmt.close();
 
         } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException e1) {
-                codeThrowRepositoryException(new RepositoryException(e.getMessage() + e1.getMessage()));
-            }
             codeThrowRepositoryException(e);
         }
-        finally {
-            try {
-                if(endTransaction)
-                    connection.setAutoCommit(true);
-            } catch (SQLException e) {
-                codeThrowRepositoryException(e);
-            }
-        }
-        return returnedId;
+
     }
 
     @Override
-    public E delete(Integer id,boolean startTransaction,boolean endTransaction) throws RepositoryException {
-        String queryD =String.format("DELETE FROM `%s` WHERE `%s` = ?",tableName,mapper.getIdTextField());
+    public E delete(ID id) throws RepositoryException {
+        String queryD =String.format("DELETE FROM `%s` WHERE `%s` = ?",tableName,this.getIdTextField());
         E el = null;
 
         try {
-            if(startTransaction){
-                connection.setAutoCommit(false);
-            }
-            el = findById(id,startTransaction,false);
+            el = findById(id);
 
             PreparedStatement stmt = connection.prepareStatement(queryD);
             stmt.setString(1,id.toString());
             stmt.executeUpdate();
-            if(endTransaction)
-                connection.commit();
+
         } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException e1) {
-                codeThrowRepositoryException(e1);
-            }
             codeThrowRepositoryException(e);
-        }
-        finally {
-            if(endTransaction)
-                try {
-                    connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    codeThrowRepositoryException(e);
-                }
         }
         return el;
     }
@@ -251,13 +186,16 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IDatabas
         try {
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.execute();
-//            connection.commit();
         } catch (SQLException e) {
             codeThrowRepositoryException(e);
         }
     }
 
     protected void codeThrowRepositoryException(Exception exc) throws RepositoryException {
+        throw new RepositoryException(exc);
+    }
+
+    protected void codeThrowRepositoryException(String exc) throws RepositoryException {
         throw new RepositoryException(exc);
     }
 
@@ -279,13 +217,16 @@ public  class DatabaseRepository<E extends IEntity<Integer>> implements IDatabas
                 stmt.setString(i+1,valuesV.get(i));
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-                E el = mapper.toObject(rs);
+                E el = this.toObject(rs);
                 list.add(el);
             }
-//            connection.commit();
         } catch (SQLException e) {
             codeThrowRepositoryException(e);
         }
         return list;
     }
+
+    protected abstract String getIdTextField();
+    protected abstract E toObject(ResultSet row) throws SQLException, EntityArgumentException;
+    protected abstract Map<String,String> toMap(E object);
 }

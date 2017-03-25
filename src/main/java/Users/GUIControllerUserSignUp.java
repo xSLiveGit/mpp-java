@@ -42,7 +42,7 @@ public class GUIControllerUserSignUp {
 
     public void signUpHandler(){
         try {
-            controller.register(textFieldUserName.getText(),textFieldPassword.getText(),true,true);
+            controller.add(textFieldUserName.getText(),textFieldPassword.getText());
             StaticHelperClass.showWarningMessage("Succesfuly registered.Try log in.");
         } catch (ControllerException e) {
             StaticHelperClass.showWarningMessage(e.getMessage());

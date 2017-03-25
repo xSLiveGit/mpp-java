@@ -1,6 +1,10 @@
 package domain;
 
 
+import utils.exceptions.EntityArgumentException;
+
+import javax.lang.model.UnknownEntityException;
+
 /**
  * Created by Sergiu on 3/11/2017.
  */
@@ -8,28 +12,31 @@ public class Match implements IEntity<Integer>{
     private String team1;
     private String team2;
     private String stage;
-    private Integer remainingTickets;
+    private Integer tickets;
     private Integer id;
     private Double price;
 
-    public Match(Integer id,String team1, String team2, String stage, Integer remainingTickets,Double price) {
+    public Match(Integer id, String team1, String team2, String stage, Integer tickets, Double price) throws EntityArgumentException {
         this.team1 = team1;
         this.team2 = team2;
         this.stage = stage;
-        this.remainingTickets = remainingTickets;
+        this.tickets = tickets;
         this.id = id;
         this.price = price;
+        if(tickets < 0){
+            throw new EntityArgumentException("The number of tickets must be >=0.");
+        }
     }
 
-    public Match(String team1,String team2,String stage,Integer remainingTickets,Double price){
-        this(-1,team1,team1,stage,remainingTickets,price);
+    public Match(String team1, String team2, String stage, Integer tickets, Double price) throws EntityArgumentException {
+        this(-1,team1,team1,stage, tickets,price);
     }
 
     public void decreaseTicketsNumber(){
-        this.remainingTickets--;
+        this.tickets--;
     }
 
-    public Match() {
+    public Match() throws EntityArgumentException {
         this(-1,"","","",0,0d);
     }
 
@@ -45,14 +52,20 @@ public class Match implements IEntity<Integer>{
         this.stage = stage;
     }
 
-    public void setRemainingTickets(Integer remainingTickets) {
-        this.remainingTickets = remainingTickets;
+    public void setTickets(Integer tickets) throws EntityArgumentException {
+        if(tickets < 0){
+            throw new EntityArgumentException("The number of tickets must be >=0.");
+        }
+        this.tickets = tickets;
     }
 
-    public String getTicketsString(){
-        if(remainingTickets <= 0)
+    public String getTicketsString() throws EntityArgumentException {
+        if(tickets < 0){
+            throw new EntityArgumentException("The number of tickets must be >=0.");
+        }
+        if(tickets == 0)
             return "SOLD OUT";
-        return remainingTickets.toString();
+        return tickets.toString();
     }
 
     public String getTeam1() {
@@ -68,8 +81,8 @@ public class Match implements IEntity<Integer>{
         return stage;
     }
 
-    public Integer getRemainingTickets() {
-        return remainingTickets;
+    public Integer getTickets() {
+        return tickets;
     }
 
     public void setPrice(Double price) {
@@ -92,14 +105,28 @@ public class Match implements IEntity<Integer>{
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if(obj instanceof Match){
-            Match m = Match.class.cast(obj);
-            return m.id.equals(this.id) &&
-                    m.team1.equals(this.team1) &&
-                    m.team2.equals(this.team2) &&
-                    m.remainingTickets.equals(this.remainingTickets);
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Match)) return false;
+
+        Match match = (Match) o;
+
+        if (!team1.equals(match.team1)) return false;
+        if (!team2.equals(match.team2)) return false;
+        if (!stage.equals(match.stage)) return false;
+        if (!tickets.equals(match.tickets)) return false;
+        if (!id.equals(match.id)) return false;
+        return price.equals(match.price);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = team1.hashCode();
+        result = 31 * result + team2.hashCode();
+        result = 31 * result + stage.hashCode();
+        result = 31 * result + tickets.hashCode();
+        result = 31 * result + id.hashCode();
+        result = 31 * result + price.hashCode();
+        return result;
     }
 }

@@ -7,32 +7,28 @@ import java.sql.Time;
  */
 public class Ticket implements IEntity<Integer> {
     private Integer id;
-    private Double price;
+    private String person;
+    private Integer quantity;
+    private Integer idMatch;
 
-    public Ticket(Integer id, Double price) {
+    public Ticket(Integer id, Integer idMatch,String person, Integer quantity) {
         this.id = id;
-        this.price = price;
+        this.person = person;
+        this.quantity = quantity;
+        this.idMatch = idMatch;
+    }
+
+    public Ticket( Integer idMatch,String person,Integer quantity) {
+        this(0,idMatch,person,quantity);
     }
 
     public Ticket() {
 
     }
 
-    public Ticket(Double price){
-        this(-1,price);
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
     @Override
     public Integer getId() {
-        return id;
+        return this.id;
     }
 
     @Override
@@ -40,13 +36,52 @@ public class Ticket implements IEntity<Integer> {
         this.id = id;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if(obj instanceof Ticket){
-            Ticket t = (Ticket)obj;
-            return this.id.equals(t.id) &&
-                    this.price.equals(t.price);
-        }
-        return false;
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
+
+    public void setIdMatch(Integer idMatch) {
+        this.idMatch = idMatch;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public Integer getIdMatch() {
+        return idMatch;
+    }
+
+    public String getPerson() {
+        return person;
+    }
+
+    public void setPerson(String person) {
+        this.person = person;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + person.hashCode();
+        result = 31 * result + quantity.hashCode();
+        result = 31 * result + idMatch.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Ticket)) return false;
+
+        Ticket ticket = (Ticket) o;
+
+        if (!id.equals(ticket.id)) return false;
+        if (!person.equals(ticket.person)) return false;
+        if (!quantity.equals(ticket.quantity)) return false;
+        return idMatch.equals(ticket.idMatch);
+    }
+
+
 }

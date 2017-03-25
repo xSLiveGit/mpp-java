@@ -1,10 +1,8 @@
 package gui;
 
 import controllers.MatchController;
-import controllers.SaleController;
 import controllers.TicketController;
 import domain.Match;
-import domain.Sale;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,7 +12,6 @@ import javafx.scene.paint.Color;
 import utils.StaticHelperClass;
 import utils.database.DatabaseConnectionManager;
 import utils.exceptions.ControllerException;
-import utils.exceptions.RepositoryException;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -26,16 +23,13 @@ import static utils.StaticHelperClass.showWarningMessage;
  */
 public class OperationGUIController {
     private String currentPerson;
-    private Integer currentTicketId = INVALID_CURRENT_TICKET_ID;
     private Match currentSelectedMatch = INVALID_CURRENT_SELECTD_MATCH;
     private ObservableList<Match> model;
     private MatchController matchController;
     private TicketController ticketController;
-    private SaleController saleController;
     private DatabaseConnectionManager databaseConnectionManager;
     private boolean tableIsFiltered = false;
 
-    private final static Integer INVALID_CURRENT_TICKET_ID = -1;
     private final static Match INVALID_CURRENT_SELECTD_MATCH = null;
     private final static String INVALID_CURRENT_PERSON = "";
     private final static String INVALID_COLUMN = "SOLD OUT";
@@ -73,10 +67,9 @@ public class OperationGUIController {
 //        label_TotalPrice.setText("25000");
     }
 
-    public void initComponents(MatchController matchController, TicketController ticketController, SaleController saleController, DatabaseConnectionManager databaseConnectionManager) throws ControllerException {
+    public void initComponents(MatchController matchController, TicketController ticketController,DatabaseConnectionManager databaseConnectionManager) throws ControllerException {
         this.matchController = matchController;
         this.ticketController = ticketController;
-        this.saleController = saleController;
         this.databaseConnectionManager = databaseConnectionManager;
         model = FXCollections.observableArrayList(( matchController.getAll()));
         this.tableView_Match.setItems(model);
@@ -122,55 +115,16 @@ public class OperationGUIController {
             showWarningMessage("The number of purchased tickets is invalid.");
         }
         else{
-            if(currentTicketId.equals(INVALID_CURRENT_TICKET_ID)){//if it's not about first match on this ticket
-                try {
-                    if(currentSelectedMatch.getRemainingTickets() < Integer.parseInt(textField_Capacity.getText())){
-                        showWarningMessage("We haven't so much tickets");
-                    }
-
-                    currentTicketId = ticketController.add(0d,true,true);
-//                    databaseConnectionManager.getConnection().setAutoCommit(false);
-                    saleController.add(currentTicketId,currentSelectedMatch.getId(),this.textField_BuyerName.getText(),Integer.parseInt(textField_Capacity.getText()),true,false);
-                    currentSelectedMatch.setRemainingTickets(currentSelectedMatch.getRemainingTickets() - Integer.parseInt(textField_Capacity.getText()));
-                    matchController.update(currentSelectedMatch.getId(),currentSelectedMatch.getTeam1(),currentSelectedMatch.getTeam2(),currentSelectedMatch.getStage(),currentSelectedMatch.getRemainingTickets().toString(),currentSelectedMatch.getPrice().toString(),false,true);
-                   // databaseConnectionManager.getConnection().commit();
-                    //  databaseConnectionManager.getConnection().setAutoCommit(true);
-                    //this.textField_BuyerName.setDisable(true);
-                    actualiseList();
-                } catch (ControllerException/* | SQLException | ClassNotFoundException*/ e) {
-                    //showWarningMessage(e.getMessage());
-                    //databaseConnectionManager.getConnection().rollback();
-                    e.printStackTrace();
-                }
-            }
-            else{
-                if(!currentSelectedMatch.equals(INVALID_CURRENT_SELECTD_MATCH)){
-                    try {
-                        saleController.add(currentTicketId,currentSelectedMatch.getId(),this.textField_BuyerName.getText(),Integer.parseInt(textField_Capacity.getText()),true,false);
-                        currentSelectedMatch.setRemainingTickets(currentSelectedMatch.getRemainingTickets() - Integer.parseInt(textField_Capacity.getText()));
-                        matchController.update(currentSelectedMatch.getId(),currentSelectedMatch.getTeam1(),currentSelectedMatch.getTeam2(),currentSelectedMatch.getStage(),currentSelectedMatch.getRemainingTickets().toString(),currentSelectedMatch.getPrice().toString(),false,true);
-//                        databaseConnectionManager.getConnection().commit();
-                        actualiseList();
-                    } catch (ControllerException /*| ClassNotFoundException |SQLException*/ e) {
-                        e.printStackTrace();
-                        showWarningMessage(e.getMessage());
-                    }
-                }
-                else{
-                    showWarningMessage("Select 1 match.");
-                }
+            try {
+                this.ticketController.add(this.currentSelectedMatch.getId().toString(),this.textField_BuyerName.getText(),textField_Capacity.getText());
+                actualiseList();
+            } catch (ControllerException e) {
+                StaticHelperClass.showWarningMessage(e.getMessage());
+                e.printStackTrace();
             }
         }
     }
 
-    public void button_ExportTicket_Handler(){
-        if(!this.currentTicketId.equals(INVALID_CURRENT_TICKET_ID)){
-            initFields();
-        }
-        else{
-            showWarningMessage("This ticket is empty");
-        }
-    }
 
     public void actualiseList() throws ControllerException {
         model.setAll(matchController.getAll());
@@ -179,35 +133,9 @@ public class OperationGUIController {
     private void initFields(){
         this.textField_BuyerName.clear();
         this.textField_BuyerName.setDisable(false);
-        this.currentTicketId = INVALID_CURRENT_TICKET_ID;
         this.currentPerson = INVALID_CURRENT_PERSON;
     }
 
-    public void button_CancelOperation_Handler(){
-        if(this.currentTicketId != INVALID_CURRENT_TICKET_ID) {
-            try {
-                List<Sale> list = saleController.getAllWithThisTicketId(this.currentTicketId);
-                databaseConnectionManager.getConnection().setAutoCommit(false);
-                for (Sale sale : list) {
-                    matchController.increaseQuantity(sale.getIdMatch(), sale.getQuantity(),false,false);
-                }
-                this.ticketController.delete(currentTicketId,false,true);
-                initFields();
-                actualiseList();
-            } catch (ControllerException | SQLException | ClassNotFoundException e) {
-                try {
-                    databaseConnectionManager.getConnection().rollback();
-                } catch (SQLException | ClassNotFoundException e1) {
-                    StaticHelperClass.showWarningMessage(e.getMessage());
-                }
-                StaticHelperClass.showWarningMessage(e.getMessage());
-            }
-        }
-        else{
-            StaticHelperClass.showWarningMessage("The ticket is already empty.");
-        }
-
-    }
 
     public void button_FilterMatches_Handler(){
 

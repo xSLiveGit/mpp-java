@@ -15,39 +15,46 @@ public class ValidatorMatch implements IValidator<Match> {
         errList = new ArrayList<>();
     }
 
-    private void validateId(Integer id){
-        if(id <= 0){
-            errList.add("Id must be positive numbers.");
-        }
+    public void validateTeam(String team)
+    {
+        if(team.equals(""))
+            errList.add("Team can't be empty.");
+        if(team.length() > 30)
+            errList.add("The length of team must be <= 30");
     }
 
-    private void validateTeamName(String teamName,Integer teamIndex){
-        if("".equals(teamName)){
-            errList.add(String.format("Team with index %d has no name.",teamIndex));
-        }
-    }
-
-    private void validateTicketsNumber(Integer ticketsNumber){
-        if(ticketsNumber < 0){
-            errList.add("The numbers of tickets must be greater than 0.");
-        }
-    }
-
-
-
-    private void validateStage(String stage){
-        if(!stage.equals("Final") && !stage.startsWith("Semifinal ") && !stage.startsWith("Group ")){
+    public void validateStage(String stage)
+    {
+        if(stage.equals(""))
+            errList.add("Stage can't be empty string.");
+        if(stage.length() > 30)
+            errList.add("The length of stage must be <= 30");
+        if ( stage.equals("Final") && !stage.startsWith("Semifinal ") && !stage.startsWith("Group "))
+        {
             errList.add("Stage is invalid. Stage must be \"Final\", \"Semifinal x\" or \"Group x\" where x is a big letter.");
         }
+    }
 
+    public void validatePrice(Double price)
+    {
+        if(price <= 0)
+            errList.add("The price must be positive integer.");
+    }
+
+    public void validateTicketsNumber(Integer ticketsNumber)
+    {
+        if(ticketsNumber < 0)
+            errList.add("Number of tickets must be non-negative integer.");
     }
 
     @Override
-    public void validate(Match el) throws RepositoryException {
+    public void validate(Match item) throws RepositoryException {
         errList.clear();
-        validateTeamName(el.getTeam1(),1);
-        validateTeamName(el.getTeam2(),2);
-        validateTicketsNumber(el.getRemainingTickets());
+        validateTeam(item.getTeam1());
+        validateTeam(item.getTeam2());
+        validateStage(item.getStage());
+        validatePrice(item.getPrice());
+        validateTicketsNumber(item.getTickets());
         if(errList.size() != 0){
             throw new RepositoryException(errList.toString());
         }
