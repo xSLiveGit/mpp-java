@@ -4,6 +4,7 @@ import domain.User;
 import repositories.DatabaseRepository;
 
 import repositories.IDatabaseRepository;
+import utils.CryptWithMD5;
 import utils.exceptions.ControllerException;
 import utils.exceptions.RepositoryException;
 
@@ -29,6 +30,7 @@ public class UserController{
 
     public void add(String user,String password,boolean startTransaction,boolean endTransaction) throws ControllerException {
         try {
+            password = CryptWithMD5.cryptWithMD5(password);
             repository.add (new User(user,password),startTransaction,endTransaction);
         } catch (RepositoryException | SQLException e) {
             codeThrowControllerExceptionStatement(e);
@@ -48,6 +50,7 @@ public class UserController{
             if(repository.getItemsByProperty(map).size() == 1)
                 codeThrowControllerExceptionStatement("There exist this username. Try again with another.");
             else{
+                password = CryptWithMD5.cryptWithMD5(password);
                 this.repository.add(new User(username,password),startTransaction,endTransaction);
             }
         } catch (RepositoryException | SQLException e) {
@@ -73,7 +76,7 @@ public class UserController{
             List<User> list = repository.getItemsByProperty(map);
             if(list.size() == 1){
                 User u = list.get(0);
-                if(password.equals(u.getPassword())){
+                if( CryptWithMD5.cryptWithMD5(password).equals(u.getPassword())){
                     return true;
                 }
                 else{
