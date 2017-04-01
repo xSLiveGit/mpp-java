@@ -2,9 +2,27 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/L2.iml" filepath="$PROJECT_DIR$/.idea/modules/L2.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/L2_main.iml" filepath="$PROJECT_DIR$/.idea/modules/L2_main.iml" group="L2" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/L2_test.iml" filepath="$PROJECT_DIR$/.idea/modules/L2_test.iml" group="L2" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MPP-Project-ClientServer.iml" filepath="$PROJECT_DIR$/.idea/modules/MPP-Project-ClientServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MPP-Project-ClientServer_main.iml" filepath="$PROJECT_DIR$/.idea/modules/MPP-Project-ClientServer_main.iml" group="MPP-Project-ClientServer" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MPP-Project-ClientServer_test.iml" filepath="$PROJECT_DIR$/.idea/modules/MPP-Project-ClientServer_test.iml" group="MPP-Project-ClientServer" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsClient/SellTicketsClient.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsClient/SellTicketsClient.iml" group="SellTicketsClient" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsClient/SellTicketsClient_main.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsClient/SellTicketsClient_main.iml" group="SellTicketsClient" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsClient/SellTicketsClient_test.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsClient/SellTicketsClient_test.iml" group="SellTicketsClient" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsModel/SellTicketsModel.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsModel/SellTicketsModel.iml" group="SellTicketsModel" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsModel/SellTicketsModel_main.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsModel/SellTicketsModel_main.iml" group="SellTicketsModel" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsModel/SellTicketsModel_test.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsModel/SellTicketsModel_test.iml" group="SellTicketsModel" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsNetworking/SellTicketsNetworking.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsNetworking/SellTicketsNetworking.iml" group="SellTicketsNetworking" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsNetworking/SellTicketsNetworking_main.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsNetworking/SellTicketsNetworking_main.iml" group="SellTicketsNetworking" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsNetworking/SellTicketsNetworking_test.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsNetworking/SellTicketsNetworking_test.iml" group="SellTicketsNetworking" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsPersistence/SellTicketsPersistence.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsPersistence/SellTicketsPersistence.iml" group="SellTicketsPersistence" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsPersistence/SellTicketsPersistence_main.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsPersistence/SellTicketsPersistence_main.iml" group="SellTicketsPersistence" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsPersistence/SellTicketsPersistence_test.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsPersistence/SellTicketsPersistence_test.iml" group="SellTicketsPersistence" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsServer/SellTicketsServer.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsServer/SellTicketsServer.iml" group="SellTicketsServer" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsServer/SellTicketsServer_main.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsServer/SellTicketsServer_main.iml" group="SellTicketsServer" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsServer/SellTicketsServer_test.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsServer/SellTicketsServer_test.iml" group="SellTicketsServer" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsServices/SellTicketsServices.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsServices/SellTicketsServices.iml" group="SellTicketsServices" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsServices/SellTicketsServices_main.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsServices/SellTicketsServices_main.iml" group="SellTicketsServices" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SellTicketsServices/SellTicketsServices_test.iml" filepath="$PROJECT_DIR$/.idea/modules/SellTicketsServices/SellTicketsServices_test.iml" group="SellTicketsServices" />
     </modules>
   </component>
 </project>

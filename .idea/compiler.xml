@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel>
-      <module name="L2_main" target="1.8" />
-      <module name="L2_test" target="1.8" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="MPP-Project-ClientServer_main" target="1.8" />
+      <module name="MPP-Project-ClientServer_test" target="1.8" />
+      <module name="SellTicketsClient_main" target="1.8" />
+      <module name="SellTicketsClient_test" target="1.8" />
+      <module name="SellTicketsModel_main" target="1.8" />
+      <module name="SellTicketsModel_test" target="1.8" />
+      <module name="SellTicketsNetworking_main" target="1.8" />
+      <module name="SellTicketsNetworking_test" target="1.8" />
+      <module name="SellTicketsPersistence_main" target="1.8" />
+      <module name="SellTicketsPersistence_test" target="1.8" />
+      <module name="SellTicketsServer_main" target="1.8" />
+      <module name="SellTicketsServer_test" target="1.8" />
+      <module name="SellTicketsServices_main" target="1.8" />
+      <module name="SellTicketsServices_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

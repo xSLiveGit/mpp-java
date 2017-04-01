@@ -1,2 +1,8 @@
-rootProject.name = 'L2'
+rootProject.name = 'MPP-Project-ClientServer'
+include 'SellTicketsModel'
+include 'SellTicketsClient'
+include 'SellTicketsNetworking'
+include 'SellTicketsPersistence'
+include 'SellTicketsServices'
+include 'SellTicketsServer'
 
