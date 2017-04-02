@@ -1,6 +1,9 @@
 package services;
 
 
-public interface ISellTicketsClient {
+import entity.Match;
+import exceptions.ControllerException;
 
+public interface ISellTicketsClient {
+    public void showUpdates(Match match) throws ControllerException;
 }

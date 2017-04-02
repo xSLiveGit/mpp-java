@@ -4,7 +4,8 @@ package network.rpcprotocol;
 
 import entity.Match;
 import entity.Sale;
-import entity.User;
+import exceptions.ControllerException;
+import jdk.nashorn.internal.ir.Block;
 import network.dto.DTOUtils;
 import network.dto.MatchDTO;
 import network.dto.SalesDTO;
@@ -14,11 +15,12 @@ import services.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * Created by Sergiu on 3/31/2017.
@@ -29,11 +31,13 @@ public class SellTicketsClientRpcWorker implements Runnable,ISellTicketsClient {
 
     private ObjectInputStream input;
     private ObjectOutputStream output;
+    private BlockingQueue<Response> blockingQueue;
     private volatile boolean connected;
 
     public SellTicketsClientRpcWorker(ISellTicketsServer server, Socket connection) {
         this.server = server;
         this.connection = connection;
+        blockingQueue = new LinkedBlockingDeque<>();
         try{
             output=new ObjectOutputStream(connection.getOutputStream());
             output.flush();
@@ -48,9 +52,17 @@ public class SellTicketsClientRpcWorker implements Runnable,ISellTicketsClient {
         while(connected){
             try {
                 Object request=input.readObject();
+
                 Response response=handleRequest((Request)request);
                 if (response!=null){
                     sendResponse(response);
+                }
+                if(blockingQueue.size() > 0){
+                    try {
+                        sendResponse(blockingQueue.take());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
@@ -96,7 +108,7 @@ public class SellTicketsClientRpcWorker implements Runnable,ISellTicketsClient {
                 case SELL_TICKETS:
                     SalesDTO salesDTO = (SalesDTO) request.data();
                     Sale sale = DTOUtils.getFromDTO(salesDTO);
-                    this.server.sellTickets(sale.getIdMatch().toString(),sale.getQuantity().toString(),sale.getPerson());
+                    this.server.sellTickets(sale.getIdMatch().toString(),sale.getQuantity().toString(),sale.getPerson(),salesDTO.getUsername());
                     response = new Response.Builder().type(ResponseType.OK).build();
                     break;
 
@@ -126,4 +138,17 @@ public class SellTicketsClientRpcWorker implements Runnable,ISellTicketsClient {
         output.flush();
     }
 
+
+    @Override
+    public void showUpdates(Match match) throws ControllerException {
+        MatchDTO matchDTO = DTOUtils.getDTO(match);
+        Response response = new Response.Builder().type(ResponseType.SHOW_UPDATED_ENTITIES).data(matchDTO).build();
+        System.out.println("Worker send update: " + match);
+        try {
+            sendResponse(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 }

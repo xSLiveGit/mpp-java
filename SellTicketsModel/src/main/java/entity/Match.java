@@ -50,11 +50,12 @@ public class Match implements IEntity<Integer>{
         this.stage = stage;
     }
 
-    public void setTickets(Integer tickets) throws EntityArgumentException {
+    public Match setTickets(Integer tickets) throws EntityArgumentException {
         if(tickets < 0){
             throw new EntityArgumentException("The number of tickets must be >=0.");
         }
         this.tickets = tickets;
+        return this;
     }
 
     public String getTicketsString() throws EntityArgumentException {

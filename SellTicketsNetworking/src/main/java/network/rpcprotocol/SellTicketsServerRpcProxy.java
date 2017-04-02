@@ -2,7 +2,6 @@ package network.rpcprotocol;
 
 
 import entity.Match;
-import entity.Sale;
 import entity.User;
 import exceptions.ControllerException;
 import network.dto.DTOUtils;
@@ -74,8 +73,8 @@ public class SellTicketsServerRpcProxy implements ISellTicketsServer {
 
 
     @Override
-    public void sellTickets(String idMatch, String quantity, String buyerPerson) throws SaleHouseException, ServiceException {
-        SalesDTO salesDTO = new SalesDTO(idMatch,quantity,buyerPerson);
+    public void sellTickets(String idMatch, String quantity, String buyerPerson,String username) throws SaleHouseException, ServiceException {
+        SalesDTO salesDTO = new SalesDTO(idMatch,quantity,buyerPerson,username);
         Request request = new Request.Builder().type(RequestType.SELL_TICKETS).data(salesDTO).build();
         this.sendRequest(request);
         Response response = this.readResponse();
@@ -83,6 +82,7 @@ public class SellTicketsServerRpcProxy implements ISellTicketsServer {
             String msg = (String) response.data();
             throw new ServiceException(msg);
         }
+        System.out.println(qresponses.size());
     }
 
 
@@ -94,8 +94,8 @@ public class SellTicketsServerRpcProxy implements ISellTicketsServer {
             String msg = (String) response.data();
             throw new ControllerException(msg);
         }
-        List<MatchDTO> artistDTOs = (List<MatchDTO>) response.data();
-        return DTOUtils.getMatchesListFromDTO(artistDTOs);
+        List<MatchDTO> matchesDTO = (List<MatchDTO>) response.data();
+        return DTOUtils.getMatchesListFromDTO(matchesDTO);
     }
 
     @Override
@@ -128,7 +128,6 @@ public class SellTicketsServerRpcProxy implements ISellTicketsServer {
         } catch (IOException e) {
             throw new SaleHouseException("Error sending object "+e);
         }
-
     }
 
     private Response readResponse() throws SaleHouseException {
@@ -163,13 +162,39 @@ public class SellTicketsServerRpcProxy implements ISellTicketsServer {
         tw.start();
     }
 
+    private boolean isUpdateResponse(Response response){
+        return  response.type().equals(ResponseType.SHOW_UPDATED_ENTITIES);
+    }
+
+    private void handleUpdate(Response response){
+        System.out.println("Proxy : HANDLE_UPDATE");
+        if (response.type() == ResponseType.SHOW_UPDATED_ENTITIES){
+            try {
+                MatchDTO matchDTO = (MatchDTO)response.data();
+                Match match = DTOUtils.getFromDTO(matchDTO);
+                client.showUpdates(match);
+            } catch (ControllerException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     private class ReaderThread implements Runnable{
         public void run() {
             while(!finished){
                 try {
                     Object response=input.readObject();
-                    qresponses.put((Response)response);
+                    System.out.println(((Response)response).type());
+                    if(isUpdateResponse((Response)response)){
+                        handleUpdate((Response)response);
+                        System.out.println("In afara cozii, coada are dimensiunea: " + qresponses.size());
+
+                    }
+                    else{
+                        System.out.println("In coada" + qresponses.size());
+
+                        qresponses.put((Response)response);
+                    }
                 } catch (IOException | ClassNotFoundException e) {
                     System.out.println("Reading error " + e.getMessage());
                 } catch (InterruptedException e) {

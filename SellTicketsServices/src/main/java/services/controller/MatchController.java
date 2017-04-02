@@ -119,4 +119,21 @@ public class MatchController {
         }
         return null;
     }
+
+    public Match findById(String id) throws ControllerException {
+        Integer nr = null;
+        Match m = null;
+        try{
+            nr = Integer.parseInt(id);
+        }
+        catch (Exception e){
+            codeThrowControllerExceptionStatement("Invalid key identifier.");
+        }
+        try {
+            m = this.matchRepository.findById(nr);
+        } catch (RepositoryException e) {
+            codeThrowControllerExceptionStatement(e);
+        }
+        return m;
+    }
 }

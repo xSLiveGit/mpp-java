@@ -46,7 +46,7 @@ public class GUIController {
         this.parent_SellTickets = loaderMainInterface.load();
          operationGUIController = loaderMainInterface.getController();
         operationGUIController.initComponents(clientController);
-
+        clientController.setOperationGUIController(operationGUIController);
         loaderMainInterface = new FXMLLoader(getClass().getResource("/FXML/matchInterface.fxml"));
         this.parent_Match = loaderMainInterface.load();
          mainGUIController = loaderMainInterface.getController();

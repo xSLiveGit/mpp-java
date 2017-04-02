@@ -35,7 +35,7 @@ public class StartClient extends Application {
             System.out.println("Using port " + serverPort);
 
             ISellTicketsServer server = new SellTicketsServerRpcProxy(serverIp,serverPort);
-            ClientController clientController = new ClientController(server);
+            ClientController clientController = new ClientController(server,null);
 
             GUI gui = new GUI(clientController);
             gui.start();

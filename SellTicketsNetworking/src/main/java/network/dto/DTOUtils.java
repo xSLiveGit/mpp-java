@@ -24,8 +24,8 @@ public class DTOUtils {
         return new UserDTO(id, pass);
     }
 
-    public static SalesDTO getDTO(Sale sale){
-        return new SalesDTO(sale.getIdMatch().toString(),sale.getQuantity().toString(),sale.getPerson());
+    public static SalesDTO getDTO(Sale sale,String username){
+        return new SalesDTO(sale.getIdMatch().toString(),sale.getQuantity().toString(),sale.getPerson(),username);
     }
 
     public static Sale getFromDTO(SalesDTO salesDTO){
