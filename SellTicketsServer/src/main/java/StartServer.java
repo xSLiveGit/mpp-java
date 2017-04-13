@@ -1,11 +1,9 @@
 
 import exceptions.RepositoryException;
-import network.utils.AbstractServer;
-import network.utils.SellTicketsRpcConcurrentServer;
-import network.utils.ServerException;
 import repository.MatchRepository;
 import repository.TicketRepository;
 import repository.UserRepository;
+import services.ISellTicketsClient;
 import services.ISellTicketsServer;
 import services.controller.MatchController;
 import services.controller.TicketController;
@@ -16,6 +14,9 @@ import utils.validator.ValidatorTicket;
 import utils.validator.ValidatorUser;
 
 import java.io.IOException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Properties;
 
 /**
@@ -42,19 +43,21 @@ public class StartServer {
         TicketController ticketController = new TicketController(ticketRepository,matchRepository);
         UserController userController = new UserController(userRepository);
 
-        ISellTicketsServer festivalServer = new SellTicketsServer(matchController,ticketController,userController);
-        int chatServerPort = 0;
-        try {
-            chatServerPort = Integer.parseInt(serverProperties.getProperty("server.port"));
-        } catch (NumberFormatException ex) {
-            System.out.println("Wrong port format. Using default port instead " + chatServerPort);
-        }
+        ISellTicketsServer sellTicketsServer = new SellTicketsServer(matchController,ticketController,userController);
+//        ISellTicketsServer sellTicketsServer = new SellTicketsServer();
 
-        AbstractServer server = new SellTicketsRpcConcurrentServer(chatServerPort, festivalServer);
-        try {
-            server.start();
-        } catch (ServerException e) {
-            System.out.println("Error starting server");
+        try{
+            String name = "SellTickets";
+            System.setProperty("java.rmi.server.hostname","127.0.0.1");
+            LocateRegistry.createRegistry(1099);
+            ISellTicketsServer stub = (ISellTicketsServer) UnicastRemoteObject.exportObject(sellTicketsServer,0);
+
+            Registry registry = LocateRegistry.getRegistry();
+            registry.rebind(name,stub);
+            System.out.println("SellTicketsServer bound");
+        }catch (Exception e){
+            System.err.println("SellTicketsServerException : " + e);
+            e.printStackTrace();
         }
     }
 }

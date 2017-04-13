@@ -17,6 +17,7 @@ import services.SaleHouseException;
 
 import javax.security.sasl.SaslException;
 import java.io.IOException;
+import java.rmi.RemoteException;
 
 /**
  * Created by Sergiu on 1/20/2017.
@@ -66,7 +67,13 @@ public class GUIControllerUserLogIn {
                 stage.setTitle("Application");
                 stage.setScene(scene);
                 stage.setResizable(false);
-
+                stage.setOnCloseRequest(e->{
+                    try {
+                        this.clientController.logout();
+                    } catch (SaleHouseException | RemoteException e1) {
+                        e1.printStackTrace();
+                    }
+                });
                 currentStage.hide();
                 stage.show();
             }

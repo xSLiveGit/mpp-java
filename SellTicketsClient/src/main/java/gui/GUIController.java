@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 
 /**
  * Created by Sergiu on 3/18/2017.
@@ -62,7 +63,7 @@ public class GUIController {
         currentScenePane.getChildren().add(parent_Match);
         try {
             mainGUIController.actualiseList();
-        } catch (ControllerException e) {
+        } catch (ControllerException | RemoteException e) {
             e.printStackTrace();
         }
     }
@@ -72,7 +73,7 @@ public class GUIController {
         currentScenePane.getChildren().addAll(parent_SellTickets);
         try {
             operationGUIController.actualiseList();
-        } catch (ControllerException e) {
+        } catch (ControllerException | RemoteException e) {
             e.printStackTrace();
         }
     }
@@ -80,6 +81,7 @@ public class GUIController {
     public void logOut_Handler(){
         System.out.print("Logout");
         try{
+            this.clientController.logout();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXML/LogIn.fxml"));
             Pane pane = loader.load();
             Scene scene = new Scene(pane);

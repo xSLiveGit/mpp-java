@@ -1,9 +1,11 @@
 package entity;
 
+import java.io.Serializable;
+
 /**
  * Created by Sergiu on 3/31/2017.
  */
-public class Sale {
+public class Sale implements Serializable {
     Integer idMatch = null;
     Integer quantity = null;
     String person = null;

@@ -1,6 +1,7 @@
 import entity.Match;
 import entity.User;
 import exceptions.ControllerException;
+import exceptions.RepositoryException;
 import services.SaleHouseException;
 import services.ISellTicketsClient;
 import services.ISellTicketsServer;
@@ -9,6 +10,7 @@ import services.controller.MatchController;
 import services.controller.TicketController;
 import services.controller.UserController;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,17 @@ public class SellTicketsServer implements ISellTicketsServer {
     private ArrayList<ISellTicketsClient> clientsList;
     private Map<String,ISellTicketsClient> loggedClients;
 
+    public SellTicketsServer(){
+        clientsList = new ArrayList<>();
+        this.loggedClients = new HashMap<>();
+        try {
+            this.matchController = Persistence.getInstance().createMatchController();
+            this.ticketController = Persistence.getInstance().createTicketController();
+            this.userController = Persistence.getInstance().createUserController();
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        }
+    }
 
     public SellTicketsServer(MatchController matchController, TicketController ticketController, UserController userController) {
         clientsList = new ArrayList<>();
@@ -88,6 +101,9 @@ public class SellTicketsServer implements ISellTicketsServer {
                         }
                 } catch (ControllerException e) {
                     System.err.println("Error notifying user");
+                } catch (RemoteException e) {
+                    System.err.println("Error notifying user - remote exception: " + e.getMessage());
+                    e.printStackTrace();
                 }
             });
         }

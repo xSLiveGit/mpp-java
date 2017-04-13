@@ -35,7 +35,8 @@ public class GUIControllerUserSignUp {
     Button button_SignUp;
 
     public void signUpHandler(){
-        controller.register(textFieldUserName.getText(),textFieldPassword.getText());
+//        controller.register(textFieldUserName.getText(),textFieldPassword.getText());
+
         StaticHelperClass.showWarningMessage("Succesfuly registered.Try log in.");
     }
 }

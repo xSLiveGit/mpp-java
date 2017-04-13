@@ -3,10 +3,12 @@ package entity;
 
 import exceptions.EntityArgumentException;
 
+import java.io.Serializable;
+
 /**
  * Created by Sergiu on 3/11/2017.
  */
-public class Match implements IEntity<Integer>{
+public class Match implements IEntity<Integer>,Serializable{
     private String team1;
     private String team2;
     private String stage;

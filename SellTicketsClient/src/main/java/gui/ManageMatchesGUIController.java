@@ -15,6 +15,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
 
+import java.rmi.RemoteException;
+
 
 /**
  * Created by Sergiu on 3/19/2017.
@@ -55,7 +57,7 @@ public class ManageMatchesGUIController {
 
     }
 
-    public void initComponents(ClientController clientController) throws ControllerException {
+    public void initComponents(ClientController clientController) throws ControllerException, RemoteException {
         this.clientController = clientController;
         model = FXCollections.observableList(clientController.getAllMatches());
         this.tableView_Match.setItems(model);
@@ -102,10 +104,12 @@ public class ManageMatchesGUIController {
     public void button_AddTicket_Handler(){
 
         try {
-            clientController.addMatch(textField_Team1.getText(),textField_Team2.getText(),textField_Stage.getText(),textField_NoTickets.getText(),textField_Price.getText());
+//            clientController.addMatch(textField_Team1.getText(),textField_Team2.getText(),textField_Stage.getText(),textField_NoTickets.getText(),textField_Price.getText());
             actualiseList();
         } catch (ControllerException e) {
             StaticHelperClass.showWarningMessage(e.getMessage());
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 
@@ -115,10 +119,12 @@ public class ManageMatchesGUIController {
             return;
         }
         try {
-            clientController.updateMatch(currentSelectedMatch.getId().toString(),textField_Team1.getText(),textField_Team2.getText(),textField_Stage.getText(),textField_NoTickets.getText(),textField_Price.getText());
+//            clientController.updateMatch(currentSelectedMatch.getId().toString(),textField_Team1.getText(),textField_Team2.getText(),textField_Stage.getText(),textField_NoTickets.getText(),textField_Price.getText());
             actualiseList();
         } catch (ControllerException  e) {
             StaticHelperClass.showWarningMessage(e.getMessage());
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 
@@ -128,14 +134,16 @@ public class ManageMatchesGUIController {
             return;
         }
         try {
-            clientController.deleteMatch(currentSelectedMatch.getId().toString());
+//            clientController.deleteMatch(currentSelectedMatch.getId().toString());
             actualiseList();
         } catch (ControllerException e){
             StaticHelperClass.showWarningMessage(e.getMessage());
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 
-    public void actualiseList() throws ControllerException {
+    public void actualiseList() throws ControllerException, RemoteException {
         model.setAll(clientController.getAllMatches());
     }
 }

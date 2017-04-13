@@ -2,19 +2,18 @@ import controller.ClientController;
 import gui.GUI;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import network.rpcprotocol.SellTicketsClientRpcWorker;
-import network.rpcprotocol.SellTicketsServerRpcProxy;
 import services.ISellTicketsServer;
 
 import java.io.IOException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Properties;
 
 /**
  * Created by Sergiu on 3/30/2017.
  */
 public class StartClient extends Application {
-    private static int defaultChatPort=55555;
-    private static String defaultServer="localhost";
+    private static String defaultServer="127.0.0.1";
     public static void main(String[] args) {
         launch(args);
     }
@@ -22,25 +21,16 @@ public class StartClient extends Application {
     public void start(Stage primaryStage) throws Exception {
         Properties clientProps=new Properties();
         try{
-            clientProps.load(StartClient.class.getResourceAsStream("./database.properties"));
-            String serverIp = clientProps.getProperty("server.host");
-            Integer serverPort = null;
-            try{
-                serverPort = Integer.parseInt(clientProps.getProperty("server.port"));
-            } catch (NumberFormatException ex){
-                System.out.println("Invalid port. Using default instead.");
-            }
-
-            System.out.println("Using ip " + serverIp);
-            System.out.println("Using port " + serverPort);
-
-            ISellTicketsServer server = new SellTicketsServerRpcProxy(serverIp,serverPort);
-            ClientController clientController = new ClientController(server,null);
-
+            String name = "SellTickets";
+            Registry registry = LocateRegistry.getRegistry(defaultServer);
+            ISellTicketsServer server = (ISellTicketsServer)registry.lookup(name);
+            System.out.println("Obtained a reference to a remote sell tickets server!");
+            ClientController clientController = new ClientController(server,null);//
             GUI gui = new GUI(clientController);
             gui.start();
         }
         catch (Exception e){
+            System.out.println(e);
             e.printStackTrace();
         }
     }

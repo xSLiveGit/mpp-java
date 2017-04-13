@@ -13,6 +13,7 @@ import javafx.scene.paint.Color;
 import services.SaleHouseException;
 import services.ServiceException;
 
+import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,14 +131,14 @@ public class OperationGUIController {
             } catch (ControllerException | EntityArgumentException e) {
                 StaticHelperClass.showWarningMessage(e.getMessage());
                 //e.printStackTrace();
-            } catch (SaleHouseException | ServiceException e) {
+            } catch (SaleHouseException | ServiceException | RemoteException e) {
                 e.printStackTrace();
             }
         }
     }
 
 
-    public void actualiseList() throws ControllerException {
+    public void actualiseList() throws ControllerException, RemoteException {
         model.setAll(clientController.getAllMatches());
     }
 
@@ -159,7 +160,7 @@ public class OperationGUIController {
                     model.setAll(clientController.getAllMatches());
                     tableIsFiltered = false;
                 }
-            } catch ( ControllerException e) {
+        } catch ( ControllerException | RemoteException e) {
             e.printStackTrace();
         }
     }

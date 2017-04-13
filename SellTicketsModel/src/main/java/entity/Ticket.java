@@ -1,9 +1,11 @@
 package entity;
 
+import java.io.Serializable;
+
 /**
  * Created by Sergiu on 3/11/2017.
  */
-public class Ticket implements IEntity<Integer> {
+public class Ticket implements IEntity<Integer> ,Serializable {
     private Integer id;
     private String person;
     private Integer quantity;
