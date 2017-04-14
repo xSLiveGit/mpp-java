@@ -1,0 +1,20 @@
+group 'MPP-Project-ClientServer'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.4.1'
+    compile project(':SellTicketsModel')
+    compile project(':SellTicketsPersistence')
+    compile project(':SellTicketsServices')
+    compile project(':SellTicketsServer')
+
+}

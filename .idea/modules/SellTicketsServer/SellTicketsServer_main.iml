@@ -10,9 +10,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: mysql:mysql-connector-java:5.1.6" level="project" />
+    <orderEntry type="module" module-name="SellTicketsModel_main" />
     <orderEntry type="module" module-name="SellTicketsServices_main" />
     <orderEntry type="module" module-name="SellTicketsPersistence_main" />
-    <orderEntry type="module" module-name="SellTicketsNetworking_main" />
-    <orderEntry type="module" module-name="SellTicketsModel_main" />
   </component>
 </module>

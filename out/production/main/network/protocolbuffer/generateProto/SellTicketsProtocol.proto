@@ -1,0 +1,46 @@
+syntax="proto3";
+package network.protocolbuffer.generateProto;
+
+//option java_package = "network.protocolbuffer.protobuf";
+option java_outer_classname = "SellTicketsProtocolBuffer";
+
+message User{
+    string id=1;
+    string password=2;
+}
+
+message Sale{
+    string idMatch=1;
+    string quantity=2;
+    string person=3;
+    string username=4;
+}
+
+message Match{
+    string id=1;
+    string team1=2;
+    string team2=3;
+    string stage=4;
+    string tickets=5;
+    string price=6;
+}
+
+message Request{
+    enum Type{UNKNOW=0;LOGIN=1;LOGOUT=2;SELL_TICKETS=3;GET_ALL=4;GET_ALL_FILTERED_SORTED=5;}
+    //Every request have a type
+    Type type = 1;
+
+    //A request shold have:
+    string error = 2;
+    Sale sale = 3;
+    User user = 4;
+}
+
+message Response{
+    enum Type{UNKNOW = 0; OK = 1; ERROR = 2; SHOW_UPDATED_ENTITIES = 3; GET_LOGGED_FRIENDS=4; FRIEND_LOGGED_IN = 5;FRIEND_LOGGED_OUT = 6; SOLD = 7;}
+    Type type = 1;
+    string error = 2;
+    //Match shold be modified match,getAll match or getAllFilteredAndSorted match
+    Match match = 3;
+
+}

@@ -1,4 +1,4 @@
-package services.controller;
+package controller;
 
 
 import entity.User;

@@ -11,4 +11,6 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile project(':SellTicketsModel')
+    compile project(':SellTicketsServices')
 }

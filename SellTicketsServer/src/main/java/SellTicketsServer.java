@@ -6,9 +6,9 @@ import services.SaleHouseException;
 import services.ISellTicketsClient;
 import services.ISellTicketsServer;
 import services.ServiceException;
-import services.controller.MatchController;
-import services.controller.TicketController;
-import services.controller.UserController;
+import controller.MatchController;
+import controller.TicketController;
+import controller.UserController;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -28,17 +28,17 @@ public class SellTicketsServer implements ISellTicketsServer {
     private ArrayList<ISellTicketsClient> clientsList;
     private Map<String,ISellTicketsClient> loggedClients;
 
-    public SellTicketsServer(){
-        clientsList = new ArrayList<>();
-        this.loggedClients = new HashMap<>();
-        try {
-            this.matchController = Persistence.getInstance().createMatchController();
-            this.ticketController = Persistence.getInstance().createTicketController();
-            this.userController = Persistence.getInstance().createUserController();
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        }
-    }
+//    public SellTicketsServer(){
+//        clientsList = new ArrayList<>();
+//        this.loggedClients = new HashMap<>();
+//        try {
+//            this.matchController = Persistence.getInstance().createMatchController();
+//            this.ticketController = Persistence.getInstance().createTicketController();
+//            this.userController = Persistence.getInstance().createUserController();
+//        } catch (RepositoryException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public SellTicketsServer(MatchController matchController, TicketController ticketController, UserController userController) {
         clientsList = new ArrayList<>();
