@@ -2,67 +2,62 @@ package repository;
 
 
 import entity.Match;
-import exceptions.EntityArgumentException;
 import exceptions.RepositoryException;
-import utils.DatabaseConnectionManager;
-import utils.validator.IValidator;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import sun.security.validator.ValidatorException;
+import utils.validator.ValidatorMatch;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Created by Sergiu on 3/25/2017.
  */
-public class MatchRepository extends AbstractDatabaseRepositoryId<Match> {
-
-    public MatchRepository(DatabaseConnectionManager dbConnManager, String tableName, IValidator<Match> validator) throws RepositoryException {
-        super(dbConnManager, tableName, validator);
+public class MatchRepository implements IRepository<Match,Integer> {
+    DataAccessObject<Match,Integer> dao;
+    ValidatorMatch validator;
+    public MatchRepository(DataAccessObject<Match,Integer> dao,ValidatorMatch validator) {
+        this.dao = dao;
+        this.validator = validator;
     }
 
     @Override
-    protected String getIdTextField() {
-        return "id";
+    @SuppressWarnings("unchecked")
+    public List<Match> getAll() throws RepositoryException {
+        return this.dao.getAll(Match.class,"matches");
     }
 
     @Override
-    protected Match toObject(ResultSet row) throws SQLException, EntityArgumentException {
-        Match match = new Match();
-        match.setId(row.getInt(1));
-        match.setTeam1(row.getString(2));
-        match.setTeam2(row.getString(3));
-        match.setStage(row.getString(4));
-        match.setTickets(row.getInt(5));
-        match.setPrice(row.getDouble(6));
-        return match;
+    public Match findById(Integer integer) throws RepositoryException {
+        return this.dao.findById(Match.class,integer);
     }
 
     @Override
-    protected Map<String, String> toMap(Match object) {
-        Map<String,String> map = new HashMap<>();
-        map.put("id",object.getId().toString());
-        map.put("team1", object.getTeam1() );
-        map.put("team2", object.getTeam2() );
-        map.put("stage",object.getStage() );
-        map.put("tickets",object.getTickets().toString());
-        map.put("price",object.getPrice().toString());
-        return map;
+    public void update(Match element) throws RepositoryException {
+        validator.validate(element);
+        this.dao.update(Match.class,element);
     }
 
-    public void sellTickets(Integer id,Integer quantity) throws RepositoryException {
-        String querry = String.format("UPDATE %s SET tickets = (tickets - ?) WHERE id = ?",tableName);
-        try {
-            PreparedStatement statement = connection.prepareStatement(querry);
-            statement.setInt(1,quantity);
-            statement.setInt(2,id);
-            Integer a = statement.executeUpdate();
-            System.out.print("a:" + a + "\n");
-        } catch (SQLException e) {
-            //e.printStackTrace();
-            codeThrowRepositoryException("You can't buy so much tickets.");
-        }
+    @Override
+    public Integer add(Match element) throws RepositoryException, SQLException {
+        validator.validate(element);
+        return this.dao.add(Match.class,element);
+    }
+
+    @Override
+    public Match delete(Integer integer) throws RepositoryException {
+        return this.dao.delete(Match.class,integer);
+    }
+
+    @Override
+    public Integer getSize() throws RepositoryException, SQLException {
+        return this.dao.getSize("matches");
+    }
+
+    @Override
+    public void clear() throws RepositoryException {
 
     }
 }
+

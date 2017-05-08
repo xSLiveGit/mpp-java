@@ -7,6 +7,8 @@ import exceptions.RepositoryException;
 import repository.UserRepository;
 import services.CryptWithMD5;
 
+import java.sql.SQLException;
+
 /**
  * Created by Sergiu on 1/19/2017.
  */
@@ -30,6 +32,8 @@ public class UserController{
         catch (RepositoryException e)
         {
             codeThrowControllerExceptionStatement(e);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

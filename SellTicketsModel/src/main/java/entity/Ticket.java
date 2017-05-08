@@ -1,56 +1,37 @@
 package entity;
 
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
  * Created by Sergiu on 3/11/2017.
  */
-public class Ticket implements IEntity<Integer> ,Serializable {
-    private Integer id;
-    private String person;
-    private Integer quantity;
-    private Integer idMatch;
 
-    public Ticket(Integer id, Integer idMatch,String person, Integer quantity) {
-        this.id = id;
+@Entity
+@Table(name = "tickets")
+public class Ticket implements IEntity<Integer> ,Serializable {
+    @Id
+    @GeneratedValue(generator="increment")
+    @GenericGenerator(name="increment", strategy = "increment")
+    @Column(name = "id")
+    private Integer id;
+
+    @Column(name = "person")
+    private String person;
+
+    @Column(name = "quantity")
+    private Integer quantity;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="idMatch")
+    private Match match;
+
+    public Ticket(String person, Integer quantity, Match match) {
         this.person = person;
         this.quantity = quantity;
-        this.idMatch = idMatch;
-    }
-
-    public Ticket( Integer idMatch,String person,Integer quantity) {
-        this(0,idMatch,person,quantity);
-    }
-
-    public Ticket() {
-
-    }
-
-    @Override
-    public Integer getId() {
-        return this.id;
-    }
-
-    @Override
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public void setIdMatch(Integer idMatch) {
-        this.idMatch = idMatch;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public Integer getIdMatch() {
-        return idMatch;
+        this.match = match;
     }
 
     public String getPerson() {
@@ -61,27 +42,36 @@ public class Ticket implements IEntity<Integer> ,Serializable {
         this.person = person;
     }
 
-    @Override
-    public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + person.hashCode();
-        result = 31 * result + quantity.hashCode();
-        result = 31 * result + idMatch.hashCode();
-        return result;
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public Match getMatch() {
+        return match;
+    }
+
+    public void setMatch(Match match) {
+        this.match = match;
+    }
+
+    public Ticket(Integer id, String person, Integer quantity, Match match) {
+        this.person = person;
+        this.quantity = quantity;
+        this.match = match;
+        this.id = id;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Ticket)) return false;
-
-        Ticket ticket = (Ticket) o;
-
-        if (!id.equals(ticket.id)) return false;
-        if (!person.equals(ticket.person)) return false;
-        if (!quantity.equals(ticket.quantity)) return false;
-        return idMatch.equals(ticket.idMatch);
+    public Integer getId() {
+        return id;
     }
 
-
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }

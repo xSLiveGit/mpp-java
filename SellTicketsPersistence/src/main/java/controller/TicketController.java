@@ -1,11 +1,14 @@
 package controller;
 
 
+import entity.Match;
 import entity.Ticket;
 import exceptions.ControllerException;
 import exceptions.RepositoryException;
 import repository.MatchRepository;
 import repository.TicketRepository;
+
+import java.sql.SQLException;
 
 /**
  * Created by Sergiu on 3/16/2017.
@@ -31,11 +34,19 @@ public class TicketController {
         }
 
         try {
-            matchRepository.sellTickets(idMatchI,quantityI);
-            id = this.ticketRepository.addId(new Ticket(idMatchI,person,quantityI));
-
+            Match match = matchRepository.findById(idMatchI);
+            if(match.getTickets() < quantityI){
+                throw new ControllerException("To many tickets.");
+            }
+            match.setTickets(match.getTickets() - quantityI);
+            this.matchRepository.update(match);
+            id = this.ticketRepository.add(new Ticket(person,quantityI,match));
+            return id;
         } catch (RepositoryException e) {
             codeThrowControllerExceptionStatement(e);
+        } catch (SQLException e) {
+            codeThrowControllerExceptionStatement(e);
+            e.printStackTrace();
         }
         return id;
     }
@@ -69,7 +80,7 @@ public class TicketController {
             codeThrowControllerExceptionStatement("Invalid integer.");
         }
         try {
-            this.ticketRepository.update(new Ticket(idI,idMatchI,person,quantityI));
+            this.ticketRepository.update(new Ticket(idI,person,quantityI,matchRepository.findById(idMatchI)));
         } catch (RepositoryException e) {
             codeThrowControllerExceptionStatement(e);
         }

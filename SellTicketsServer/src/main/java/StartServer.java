@@ -1,8 +1,6 @@
 
 import exceptions.RepositoryException;
-import repository.MatchRepository;
-import repository.TicketRepository;
-import repository.UserRepository;
+import repository.*;
 import services.ISellTicketsServer;
 import controller.MatchController;
 import controller.TicketController;
@@ -32,11 +30,11 @@ public class StartServer {
         }
 
         DatabaseConnectionManager databaseConnectionManager = new DatabaseConnectionManager(serverProperties);
-
-        MatchRepository matchRepository = new MatchRepository(databaseConnectionManager,"matches",new ValidatorMatch());
-        TicketRepository ticketRepository = new TicketRepository(databaseConnectionManager,"tickets",new ValidatorTicket());
+        DataAccessObject dataAccessObject = new DataAccessObject();
+        MatchRepository matchRepository = new MatchRepository(dataAccessObject,new ValidatorMatch());
+        TicketRepository ticketRepository = new TicketRepository(dataAccessObject,new ValidatorTicket());
         ValidatorUser validatorUser = new ValidatorUser();
-        UserRepository userRepository = new UserRepository(databaseConnectionManager,"users",validatorUser);
+        UserRepository userRepository = new UserRepository(new ValidatorUser());
 
         MatchController matchController = new MatchController(matchRepository);
         TicketController ticketController = new TicketController(ticketRepository,matchRepository);

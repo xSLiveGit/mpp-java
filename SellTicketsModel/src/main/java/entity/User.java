@@ -1,14 +1,26 @@
 package entity;
 
+
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 
 /**
  * Created by Sergiu on 1/19/2017.
  */
+
+@Entity
+@Table(name = "users")
 public class User implements IEntity<String> ,Serializable {
+    @Id
+    @Column(name = "username")
     private String username;
+
+    @Column(name = "password")
     private String password;
-    private Integer id;
 
     @Override
     public String getId() {
@@ -20,15 +32,12 @@ public class User implements IEntity<String> ,Serializable {
         setUsername(s);
     }
 
-
-    public User(String username, String password) {
-        this(-1,username,password);
+    public User() {
     }
 
-    public User(Integer id,String username,String password) {
+    public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.id = id;
     }
 
     public String getPassword(){
@@ -51,19 +60,15 @@ public class User implements IEntity<String> ,Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
-
         User user = (User) o;
-
         if (!username.equals(user.username)) return false;
-        if (!password.equals(user.password)) return false;
-        return id.equals(user.id);
+        return password.equals(user.password);
     }
 
     @Override
     public int hashCode() {
         int result = username.hashCode();
         result = 31 * result + password.hashCode();
-        result = 31 * result + id.hashCode();
         return result;
     }
 }

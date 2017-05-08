@@ -7,6 +7,7 @@ import exceptions.EntityArgumentException;
 import exceptions.RepositoryException;
 import repository.MatchRepository;
 
+import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,8 +43,11 @@ public class MatchController {
 
         Integer id = null;
         try {
-            id =  matchRepository.addId(m);
+            id =  matchRepository.add(m);
         } catch (RepositoryException e) {
+            codeThrowControllerExceptionStatement(e);
+        } catch (SQLException e) {
+            e.printStackTrace();
             codeThrowControllerExceptionStatement(e);
         }
         return id;

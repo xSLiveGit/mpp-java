@@ -24,11 +24,13 @@ public abstract class AbstractDatabaseRepository<E extends IEntity<ID>,ID> imple
     protected String tableName;
     protected Connection connection;
     protected IValidator<E> validator;
+    DatabaseConnectionManager databaseConnectionManager;
     public AbstractDatabaseRepository(DatabaseConnectionManager dbConnManager, String tableName, IValidator<E> validator) throws RepositoryException {
         try {
             this.connection = dbConnManager.getConnection();
             this.tableName = tableName;
             this.validator = validator;
+            this.databaseConnectionManager = dbConnManager;
         } catch (SQLException | ClassNotFoundException e) {
             codeThrowRepositoryException(e);
         }
@@ -36,6 +38,13 @@ public abstract class AbstractDatabaseRepository<E extends IEntity<ID>,ID> imple
 
     @Override
     public List<E> getAll() throws RepositoryException {
+        try {
+            this.connection = databaseConnectionManager.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         String query = String.format("SELECT * FROM `%s`",tableName);
         ArrayList<E> list = new ArrayList<E>();
         try {
@@ -54,6 +63,13 @@ public abstract class AbstractDatabaseRepository<E extends IEntity<ID>,ID> imple
 
     @Override
     public E findById(ID id) throws RepositoryException {
+        try {
+            this.connection = databaseConnectionManager.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         String query = String.format("SELECT * FROM `%s` WHERE `%s` = ?",tableName,this.getIdTextField());
         ResultSet rs = null;
         PreparedStatement stmt;
@@ -82,6 +98,13 @@ public abstract class AbstractDatabaseRepository<E extends IEntity<ID>,ID> imple
 
     @Override
     public void update(E element) throws RepositoryException {
+        try {
+            this.connection = databaseConnectionManager.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         validator.validate(element);
         String updateS = "";
         Map<String,String> map = this.toMap(element);
@@ -113,6 +136,13 @@ public abstract class AbstractDatabaseRepository<E extends IEntity<ID>,ID> imple
 
     @Override
     public void add(E element) throws RepositoryException {
+        try {
+            this.connection = databaseConnectionManager.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         validator.validate(element);
 
         ArrayList<String> paramsV = new ArrayList<>();
@@ -152,6 +182,13 @@ public abstract class AbstractDatabaseRepository<E extends IEntity<ID>,ID> imple
 
     @Override
     public E delete(ID id) throws RepositoryException {
+        try {
+            this.connection = databaseConnectionManager.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         String queryD =String.format("DELETE FROM `%s` WHERE `%s` = ?",tableName,this.getIdTextField());
         E el = null;
 
@@ -170,6 +207,13 @@ public abstract class AbstractDatabaseRepository<E extends IEntity<ID>,ID> imple
 
     @Override
     public Integer getSize() throws RepositoryException {
+        try {
+            this.connection = databaseConnectionManager.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         String query = String.format("SELECT COUNT(*) as sz FROM `%s`",tableName);
         Integer a = 0;
         try {
@@ -186,6 +230,13 @@ public abstract class AbstractDatabaseRepository<E extends IEntity<ID>,ID> imple
 
     @Override
     public void clear() throws RepositoryException {
+        try {
+            this.connection = databaseConnectionManager.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         String query = String.format("DELETE FROM `%s`", tableName);
         try {
             PreparedStatement stmt = connection.prepareStatement(query);
@@ -204,6 +255,13 @@ public abstract class AbstractDatabaseRepository<E extends IEntity<ID>,ID> imple
     }
 
     public List<E> getItemsByProperty(Map<String,String> map) throws RepositoryException {
+        try {
+            this.connection = databaseConnectionManager.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         ArrayList<String> paramsV = new ArrayList<>();
         ArrayList<String> valuesV = new ArrayList<>();
         ArrayList<E> list = new ArrayList<E>();

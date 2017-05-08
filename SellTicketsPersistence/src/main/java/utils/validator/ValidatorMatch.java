@@ -29,7 +29,7 @@ public class ValidatorMatch implements IValidator<Match> {
             errList.add("Stage can't be empty string.");
         if(stage.length() > 30)
             errList.add("The length of stage must be <= 30");
-        if ( stage.equals("Final") && !stage.startsWith("Semifinal ") && !stage.startsWith("Group "))
+        if ( !stage.startsWith("Final") && !stage.startsWith("Semifinal ") && !stage.startsWith("Group "))
         {
             errList.add("Stage is invalid. Stage must be \"Final\", \"Semifinal x\" or \"Group x\" where x is a big letter.");
         }

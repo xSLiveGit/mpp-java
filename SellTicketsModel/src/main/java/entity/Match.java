@@ -2,19 +2,46 @@ package entity;
 
 
 import exceptions.EntityArgumentException;
+import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Created by Sergiu on 3/11/2017.
  */
+
+@Entity
+@Table(name = "matches")
 public class Match implements IEntity<Integer>,Serializable{
+    @Column(name = "team1")
     private String team1;
+
+    @Column(name = "team2")
     private String team2;
+
+    @Column(name = "stage")
     private String stage;
+
+    @Column(name = "tickets")
     private Integer tickets;
+
+    @Id
+    @GeneratedValue(generator="increment")
+    @GenericGenerator(name="increment", strategy = "increment")
+    @Column(name = "id")
     private Integer id;
+
+    @Column(name = "price")
     private Double price;
+
+//    @OneToMany(fetch = FetchType.LAZY,mappedBy="matches")
+//    private Set<Ticket> allTickets;
+//
+//    public Set<Ticket> getAllTickets() {
+//        return allTickets;
+//    }
 
     public Match(Integer id, String team1, String team2, String stage, Integer tickets, Double price) throws EntityArgumentException {
         this.team1 = team1;

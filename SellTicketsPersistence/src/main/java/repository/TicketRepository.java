@@ -1,48 +1,59 @@
 package repository;
 
 
+import entity.Match;
 import entity.Ticket;
 import exceptions.RepositoryException;
-import utils.DatabaseConnectionManager;
-import utils.validator.IValidator;
+import utils.validator.ValidatorTicket;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Created by Sergiu on 3/25/2017.
  */
-public class TicketRepository extends AbstractDatabaseRepositoryId<Ticket> {
-    public TicketRepository(DatabaseConnectionManager dbConnManager, String tableName, IValidator<Ticket> validator) throws RepositoryException {
-        super(dbConnManager, tableName, validator);
+public class TicketRepository implements IRepository<Ticket,Integer> {
+    DataAccessObject<Ticket,Integer> dao;
+    ValidatorTicket validator;
+    public TicketRepository(DataAccessObject<Ticket, Integer> dao,ValidatorTicket validator) {
+        this.dao = dao;
+        this.validator = validator;
     }
 
     @Override
-    protected String getIdTextField() {
-        return "id";
+    public List<Ticket> getAll() throws RepositoryException {
+        return this.dao.getAll(Ticket.class,"tickets");
     }
 
     @Override
-    protected Ticket toObject(ResultSet row) throws SQLException {
-        Ticket ticket = new Ticket();
-        ticket.setId(row.getInt(1));
-        ticket.setIdMatch(row.getInt(2));
-        ticket.setPerson(row.getString(3));
-        ticket.setQuantity(row.getInt(4));
-        return ticket;
+    public Ticket findById(Integer integer) throws RepositoryException {
+        return this.dao.findById(Ticket.class,integer);
     }
 
     @Override
-    protected Map<String, String> toMap(Ticket object) {
-        Map<String,String> map = new HashMap<>();
-        map.put("id",object.getId().toString());
-        map.put("idMatch",object.getIdMatch().toString());
-        map.put("person",object.getPerson());
-        map.put("quantity",object.getQuantity().toString());
-        return map;
+    public void update(Ticket element) throws RepositoryException {
+        validator.validate(element);
+        this.dao.update(Ticket.class,element);
     }
 
+    @Override
+    public Integer add(Ticket element) throws RepositoryException, SQLException {
+        validator.validate(element);
+        return this.dao.add(Ticket.class,element);
+    }
 
+    @Override
+    public Ticket delete(Integer integer) throws RepositoryException {
+        return this.dao.delete(Ticket.class,integer);
+    }
+
+    @Override
+    public Integer getSize() throws RepositoryException, SQLException {
+        return this.dao.getSize("tickets");
+    }
+
+    @Override
+    public void clear() throws RepositoryException {
+
+    }
 }
